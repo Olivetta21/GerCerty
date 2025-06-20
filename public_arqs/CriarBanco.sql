@@ -114,7 +114,30 @@ create table permissoes (
 
 
 -- VIEWS
-
+CREATE VIEW vw_certificado_completo as (
+    select c.codi as id, c.versao, 'escondido' as local, c.empresa, rfb.nome as resprfb, v.revl as usos, upper(c.nome) as nome, c.vencimento as venc, i.notf, i.agnd, i.prbl from certificado c
+    left join (
+        SELECT 
+            cert_codi, cert_versao,
+            bool_or(type = 'AGND') AS agnd,
+            bool_or(type = 'NOTF') AS notf,
+            count (*) FILTER (where type = 'PRBL') AS prbl
+        FROM 
+            cronograma
+        group by cert_codi, cert_versao
+    ) as i on i.cert_codi = c.codi and i.cert_versao = c.versao
+    left join (
+        SELECT 
+            cert_codi, count(*) as revl
+        FROM 
+            cronograma
+        WHERE type = 'REVL'
+        group by cert_codi
+    ) as v on v.cert_codi = c.codi
+    left join (
+        select codi, nome from certificado
+    ) as rfb on rfb.codi = c.respRFB
+);
 
 
 
@@ -164,6 +187,34 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+
+CREATE OR REPLACE FUNCTION fn_get_certificado_filtered(p_codi text, p_nome text, p_dataini date, p_datafim date)
+RETURNS SETOF vw_certificado_completo
+AS $$
+DECLARE
+    sql text := 'SELECT * FROM vw_certificado_completo WHERE true';
+BEGIN
+    -- Recebe uma string representando um array de codigos separados por ;
+    IF p_codi IS NOT NULL AND p_codi <> '' THEN
+        sql := sql || format(' AND id = ANY (string_to_array(%L, '','')::int[])',
+                             replace(p_codi, ';', ','));
+    END IF;
+
+    IF p_nome IS NOT NULL THEN
+        sql := sql || format(' AND nome ILIKE %L', '%'||p_nome||'%');
+    END IF;
+
+    IF p_dataini IS NOT NULL THEN
+        sql := sql || format(' AND venc >= %L', p_dataini);
+    END IF;
+
+    IF p_datafim IS NOT NULL THEN
+        sql := sql || format(' AND venc <= %L', p_datafim);
+    END IF;
+
+    RETURN QUERY EXECUTE sql;
+END;
+$$ LANGUAGE plpgsql;
 
 
 
