@@ -1,0 +1,216 @@
+#telasistemaholder {
+    height: 100%;
+    width: 100%;
+
+    padding: 30px;
+
+    background-color: var(--fundoAzul);
+
+    font-size: large;
+
+    display: grid;
+
+    grid-template-areas: 
+    'head head head head head'
+    'opt conf conf conf conf'
+    'opt conf conf conf conf'
+    'opt conf conf conf conf'
+    'opt conf conf conf conf'
+    'opt conf conf conf conf'
+    'opt conf conf conf conf'
+    'opt conf conf conf conf'
+    'opt conf conf conf conf'
+    'opt conf conf conf conf'
+    ;
+
+    grid-template-rows: repeat(10, 1fr);
+    grid-template-columns: repeat(5, 1fr);
+
+    gap: 20px;
+}
+
+#telasistemaholder .whitesoftshadow {
+    padding: 10px;
+}
+
+#tsh-header {
+    grid-area: head;
+
+    display: flex;
+    gap: 5px;
+}
+#tsh-header>div {
+    flex: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+#tsh-header>button{
+    height: 100%;
+    aspect-ratio: 1;
+}
+
+#tsh-opcoescont {
+    grid-area: opt;
+
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+    gap:20px;
+}
+#tsh-opcoescont>div {
+    border: 1px solid var(--bordCinza);
+
+    padding: 10px;
+    border-radius: 1em;
+
+    cursor: pointer;
+}
+#tsh-opcoescont>div:hover {
+    background-color: wheat;
+}
+#tsh-opcoescont>div:active {
+    background-color: sandybrown;
+}
+
+#tsh-config {
+    grid-area: conf;
+    
+    padding: 10px;
+}
+.pesquisausuariosistema {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#tsh-config>div{
+    display: flex;
+    flex-direction: column;
+
+    gap: 20px;
+}
+
+#tsh-config input {
+    font-size: large;
+}
+
+.tsh-userconf {
+    display: grid;
+    min-height: 500px;
+
+    grid-template-areas:
+    'cred'
+    'info'
+    'info'
+    'info'
+    'info'
+    'info'
+    'info'
+    'info'
+    'info'
+    'info'
+    ;
+
+    grid-template-rows: repeat(10, 1fr);
+    grid-template-columns: repeat(1, 1fr);
+
+
+    gap: 10px;
+}
+
+.tsh-uc-cred {
+    grid-area: cred;
+
+
+
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-evenly;
+}
+.tsh-uc-infos {
+    grid-area: info;
+
+    display: grid;
+    
+    grid-template-areas:
+    'input perm'
+    'input perm'
+    'input perm'
+    'input perm'
+    'input perm'
+    'input perm'
+    'input perm'
+    'input perm'
+    'input perm'
+    'input save'  
+    ;
+
+    grid-template-rows: repeat(10, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+
+    
+    gap: 10px;
+}
+.tsh-uc-i-input {
+    grid-area: input;
+
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;   
+
+}
+.tsh-uc-i-input>div{
+    border: 1px solid var(--bordCinza);
+    
+}
+
+.tsh-uc-i-perms {
+    grid-area: perm;
+
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    text-align: center;
+
+}
+
+.tsh-uc-i-p-head {
+    border: 1px solid var(--bordCinza);
+    height: 10%;
+}
+
+.tsh-uc-i-p-body {
+    border: 1px solid var(--bordCinza);
+
+    flex: auto;
+
+}
+
+.tsh-uc-i-p-body>div{
+    border: 1px solid black;
+    
+    padding: 5px;
+    margin: 5px;
+}
+.tsh-uc-i-p-body>div:hover{
+    box-shadow: var(--sombraSuave);
+}
+
+
+
+.tsh-uc-i-save {
+    border: 1px solid var(--bordCinza);
+    grid-area: save;
+}
+
+
+
+
+

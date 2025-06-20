@@ -1,0 +1,183 @@
+.vendacontainer {
+    padding: 10px;
+    background-color: #00bbff79;
+
+    height: 100%;
+    display: grid;
+
+    grid-template-areas: 
+    'header header header header'
+    'certificado venda venda venda'
+    'certificado venda venda venda'
+    'certificado venda venda venda'
+    'certificado venda venda venda'
+    'certificado venda venda venda'
+    'certificado venda venda venda'
+    'certificado venda venda venda'
+    'certificado venda venda venda'
+    'certificado venda venda venda'
+    'certificado venda venda venda'
+    ;
+
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(11, 1fr);
+
+    gap: 10px;
+}
+.header {
+    grid-area: header;
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+}
+.header>button {
+    height: 100%;
+    aspect-ratio: 1;
+}
+.header>div{
+    flex: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center ;
+}
+
+.certs {
+    background-color: white;
+    border-radius: 1em;
+    box-shadow: var(--sombraSuave);
+    
+    grid-area: certificado;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.c-head {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+.c-table-holder {
+
+}
+.c-table-cont {
+
+}
+
+
+
+
+
+.venda {
+    background-color: white;
+    border-radius: 1em;
+    
+    box-shadow: var(--sombraSuave);
+
+    grid-area: venda;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.notvending {
+    justify-content: center;
+    align-items: center;
+}
+.pessoa {
+    
+}
+.certificado {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-evenly;
+    text-align: center;
+
+    gap: 5px;
+}
+.certificado>div {
+    padding: 5px;
+    border: 1px solid var(--bordCinza);
+    flex: auto;
+}
+
+.valores {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    align-items: center;
+    gap: 5px;
+}
+.valores>div{
+    flex: auto;
+
+    border: 1px solid var(--bordCinza);
+    border-radius: 1em;
+    padding: 5px;
+
+    font-size: 2.8vh;
+
+    text-align: center;
+    width: min-content;
+    text-wrap: nowrap;
+}
+.valores input {
+    text-align: center;
+    font-size: 2.8vh;
+    background: none;
+    border: 0;
+
+    width: 100%;
+}
+
+
+.vempresa {
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-evenly;
+    text-align: center;
+}
+.novos {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+
+    text-align: center;
+}
+.footer {
+    display: flex;
+    flex-direction: row;
+    height: 5%;
+    gap: 5px;
+}
+.footer button {
+    flex: auto;
+}
+
+.pessoa td {
+    width: 25%;
+    padding: 0;
+    font-size: 2.8vh;
+
+    text-align: center;
+}
+.pessoa input {
+    text-align: center;
+    width: 100%;
+    height: 100%;
+
+    vertical-align: middle;
+    font-size: 2.8vh;
+
+    
+    background: rgb(255, 244, 223);
+    border: 0;
+}
+
+.pessoa thead>tr>th {
+    text-align: center;
+}

@@ -1,0 +1,326 @@
+
+
+tr {
+    text-wrap: nowrap;
+}
+.tbl-head-head {
+    z-index: 1;    
+}
+.tbl-head-body {
+
+}
+.pchknaopago {
+    box-shadow: inset 0px -10px 1px 0px rgba(255,0,0,0.3);
+}
+.pchkpago {
+    box-shadow: inset 0px -10px 1px 0px rgba(0, 255, 0, 0.3);
+}
+.tbl-lista-head {
+    background-color: darkgoldenrod;
+}
+.tbl-lista-body {
+    background-color: antiquewhite;
+}
+
+
+#paymentcont {
+    padding: 10px;
+    background-color: #00bbff79;
+
+    height: 100%;
+    display: grid;
+    grid-template-areas: 
+    'left right right right right';
+
+    grid-template-columns: repeat(5, 1fr); /* 2 colunas de largura igual */
+
+    gap: 10px;
+}
+@media only screen and (max-width: 800px) {
+    #paymentcont {
+        height: 200%;
+    
+        grid-template-areas: 
+        'right'
+        'left'
+        ;
+    
+        grid-template-columns: repeat(1, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+
+        gap: 50px;
+    }
+}
+
+
+.grid0-0 {
+    grid-area: left;
+}
+.grid0-1 {
+    grid-area: right;
+}
+
+
+
+
+
+.payoutsholder {
+
+    display: grid;
+
+    grid-template-areas: 
+    'head'
+    'table'
+    'table'
+    'table'
+    'table'
+    'table2'
+    'table2'
+    'table2'
+    'table2'
+    'confirm';
+
+    grid-template-rows: repeat(10, 1fr);
+
+    gap: 10px;
+}
+.grid1-0b {
+    grid-area: head;
+}
+.grid1-1b {
+    grid-area: table;
+}
+.grid1-2b {
+    grid-area: table2;
+}
+.grid1-3b {
+    grid-area: confirm;
+}
+
+.payoutscont {
+    box-shadow: var(--sombraSuave);
+    border-radius: 1em;
+
+    background-color: white;
+}
+
+.payoutstableholder {
+    height: 0;
+}
+
+.payoutsinfo {
+
+}
+
+
+
+
+
+
+
+
+
+.paycheckholder {
+
+    display: grid;
+
+    grid-template-areas: 
+    'header'
+    'body'
+    'body'
+    'body'
+    'body'
+    'body'
+    'body'
+    'body'
+    'body'
+    'footer';
+
+    grid-template-rows: repeat(10, 1fr);
+
+    gap: 10px;
+
+}
+
+.grid1-0 {
+    grid-area: header;
+}
+.grid1-1 {
+    grid-area: body;
+}
+.grid1-2 {
+    grid-area: footer;
+}
+
+
+.pcheader {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 2px;
+}
+.pcheader>div {
+    flex: auto;
+
+    display: flex;
+    flex-direction: row;
+}
+.pcheader>button {
+    border-radius: 1em;
+    height: 100%;
+    aspect-ratio: 1;
+}
+
+
+.pcheaderdatesearch {
+    display: flex;
+    flex-direction: row;
+
+    flex-wrap: wrap;
+    width: 50%;
+
+    justify-content: space-around;
+    align-items: center;
+}
+
+.pcbody {    
+    display: grid;
+
+    grid-template-areas:
+    'left right';
+
+    grid-template-columns: repeat(2, 1fr); /* 2 colunas de largura igual */
+
+    gap: 10px;
+}
+@media only screen and (max-width: 800px) {
+    .pcbody {    
+        grid-template-areas: 
+        'left'
+        'right'
+        ;
+    
+        grid-template-columns: repeat(1, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+    }
+}
+
+
+.grid2-0{
+    grid-area: right;
+}
+.grid2-1{
+    grid-area: left;
+}
+
+
+
+
+
+.beneholder {
+
+    display: grid;
+
+    grid-template-areas: 
+    'top'
+    'top'
+    'top'
+    'top'
+    'top'
+    'top'
+    'top'
+    'top'
+    'top'
+    'bottom';
+    
+    grid-template-rows: repeat(10, 1fr);
+    gap: 10px;
+}
+.grid3-0 {
+    grid-area: top;
+}
+.grid3-1 {
+    grid-area: bottom;
+}
+
+.benecont{
+    box-shadow: var(--sombraSuave);
+    border-radius: 1em;
+    background-color: white;
+}
+
+.paybutton {
+    box-shadow: var(--sombraSuave);
+    border-radius: 1em;
+
+    display: flex;
+    flex-direction: row;
+
+    justify-content: space-evenly;
+    text-align: center;
+    align-items: center;
+
+    background-color: white;
+}
+.paybutton.i2 {
+
+}
+.paybutton:hover {
+    background-color: rgb(255, 247, 232);
+	transition: 0.2s;
+}
+
+
+
+.paycheck-table {
+
+}
+  
+  .paycheck-table th,
+  .paycheck-table td {
+    
+  }
+  
+  .paycheck-table th {
+  }
+  
+  .bene-listagem-cont {
+    padding: 10px;
+  }
+
+  .bene-listagem {
+    
+  }
+
+  .table-container {
+    width: 0;
+    margin-bottom: 50px;
+  }
+
+  .table-holder1{
+    height: 0;    
+  }
+  
+  .expanded-row {
+    background-image: linear-gradient(0, white, transparent);
+  }
+
+
+
+  /* Transição para a expansão */
+.expand-enter-active,
+.expand-leave-active {
+  transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+}
+
+.expand-enter-from,
+.expand-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.expand-enter-to,
+.expand-leave-from {
+  max-height: 200px; /* Ajuste conforme necessário */
+  opacity: 1;
+}
