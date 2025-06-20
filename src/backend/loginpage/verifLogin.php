@@ -24,60 +24,39 @@ if (isset($_POST['usercred'])) {
 			$password = str_replace($verifyString, '', $password);
 		}
 	}	
-	
 
-    $sql = "
-        SELECT login, senha, nome, vend_comiss from usuario where login = :login and senha = :senha;
-    ";
-
-    $sql_last_login = "select data from logins_usuario where usuario_login = :login order by data desc limit 1;";
-    $sql_insert_login = "insert into logins_usuario (usuario_login, ip) values (:login, :ip);";
-
-    $lastKnowUpdate = "select max(id) from atualizacoes;";
     $token = genTK();
-    $tokensql = "update usuario set token = '$token' where login = :login and senha = :senha;";
-
+    
     try {
         $pdo->beginTransaction();
 
-        //encontrar usuario
-        $stmt = $pdo->prepare($sql);		
+        // Using the new fn_do_user_login function
+        $sql = "SELECT * FROM fn_do_user_login(:login, :senha, :ip, :token)";
+        $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':login', $login, PDO::PARAM_STR);
         $stmt->bindParam(':senha', $password, PDO::PARAM_STR);
-		$stmt->execute();
-        $retornar = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt->bindParam(':ip', $cli_Ip, PDO::PARAM_STR);
+        $stmt->bindParam(':token', $token, PDO::PARAM_STR);
+        $stmt->execute();
+        $loginResult = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($retornar){
-            //pegar ultimo login
-            $stmt_last_login = $pdo->prepare($sql_last_login);
-            $stmt_last_login->bindParam(":login", $login, PDO::PARAM_STR);
-            $stmt_last_login->execute();
-            $last_login = $stmt_last_login->fetchAll(PDO::FETCH_COLUMN);
-            $last_login = (count($last_login) > 0) ? $last_login[0] : 'nunca';
-    
-            //inserir registro de login
-            $stmt_insert_login = $pdo->prepare($sql_insert_login);
-            $stmt_insert_login->bindParam(":login", $login, PDO::PARAM_STR);
-            $stmt_insert_login->bindParam(":ip", $cli_Ip, PDO::PARAM_STR);
-            $stmt_insert_login->execute();
-    
-            //definir token
-            $stmtTK = $pdo->prepare($tokensql);
-            $stmtTK->bindParam(':login', $login, PDO::PARAM_STR);
-            $stmtTK->bindParam(':senha', $password, PDO::PARAM_STR);
-            $stmtTK->execute();
-                    
-            //ultimo id das atualizações
-            $stmtLKU = $pdo->query($lastKnowUpdate);
-            $retLKU = $stmtLKU->fetchAll(PDO::FETCH_ASSOC);
-    
-            $user_permissions = getUserPermissions(["pdo"=>$pdo, "usuario"=>$retornar[0]['login']]);
-
-
+        if ($loginResult) {
+            $user_permissions = getUserPermissions(["pdo"=>$pdo, "usuario"=>$loginResult['login']]);
+            
+            $credential = [
+                'login' => $loginResult['login'],
+                'nome' => $loginResult['nome'],
+                'senha' => $loginResult['senha'],
+                'vend_comiss' => $loginResult['vend_comiss']
+            ];
+            
+            $last_login = $loginResult['last_login'] ?: 'nunca';
+            
             $pdo->commit();
-			echo correctJson2(["credent" => $retornar[0], "user_permissions" => $user_permissions, "LKU" => $retLKU[0]['max'], "TK" => $token, "last_login" => $last_login]);
+            echo correctJson2(["credent" => $credential, "user_permissions" => $user_permissions, "LKU" => $loginResult['last_update'], "TK" => $loginResult['token'], "last_login" => $last_login]);
             exit;
         }
+        
         $pdo->rollBack();
         echo correctJson("error", "Usuario ou senha incorreto.");
         exit;

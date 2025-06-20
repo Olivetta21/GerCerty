@@ -1,0 +1,222 @@
+CREATE TABLE usuario (
+    login VARCHAR(32) PRIMARY KEY,
+    nome VARCHAR(80) NOT NULL,
+    senha VARCHAR(16) NOT NULL,
+	bene_comiss NUMERIC(10,2) not null DEFAULT 0,
+	vend_comiss NUMERIC(10,2) not null DEFAULT 0,
+	token text
+);
+
+
+CREATE TABLE logins_usuario (
+	id SERIAL PRIMARY key,
+	usuario_login VARCHAR(32) not null REFERENCES usuario(login),
+	ip VARCHAR(16) not null DEFAULT ' ',
+	data TIMESTAMP not null DEFAULT now()
+);
+
+CREATE TABLE certificado (
+    codi INTEGER PRIMARY KEY,
+    nome VARCHAR(80) NOT NULL,
+    vencimento DATE NOT NULL,
+    local VARCHAR(16),
+    
+	empresa BOOLEAN DEFAULT FALSE,
+    respRFB INTEGER REFERENCES certificado(codi) CHECK (respRFB IS NULL OR empresa = TRUE),
+    
+    versao INTEGER NOT NULL
+);
+
+
+CREATE TABLE cronograma (
+    id SERIAL PRIMARY KEY,
+    cert_codi INTEGER NOT NULL REFERENCES certificado(codi),
+    cert_versao INTEGER NOT NULL,
+    type VARCHAR(4) NOT NULL CHECK (type IN ('NOTF', 'AGND', 'REVL', 'PRBL')),
+    usuario_login VARCHAR(32) NOT NULL REFERENCES usuario(login),
+    nota VARCHAR(256),
+    data TIMESTAMP DEFAULT NOW(),
+); CREATE UNIQUE INDEX uni_agnd_p_ver ON cronograma (cert_codi, cert_versao, type) WHERE type = 'AGND';
+
+
+CREATE TABLE atualizacoes (
+    id SERIAL PRIMARY KEY,
+    usuario varchar(32) not null REFERENCES usuario(login),
+    header VARCHAR(4) NOT NULL,
+    body VARCHAR(16) NOT NULL
+);
+
+
+CREATE TABLE venda (
+    id SERIAL PRIMARY KEY,
+	
+    cron_agnd integer REFERENCES cronograma(id) DEFAULT null,
+	bene_comiss NUMERIC(5, 2) default 0 CHECK (cron_agnd is not null or bene_comiss = 0),
+	
+    vend_login varchar(32) NOT NULL REFERENCES usuario(login),
+    vend_comiss NUMERIC(5, 2) default 0,
+
+    cert_codi integer NOT NULL REFERENCES certificado(codi),
+	cert_versao integer NOT NULL,
+    valor NUMERIC(10, 2) NOT NULl,
+	despesa NUMERIC(10, 2) DEFAULT 0,
+	data TIMESTAMP DEFAULT now(),
+	
+	unique (cert_codi, cert_versao)
+);
+
+create table pagamento_info (
+	id serial primary key,
+	usuario_login varchar(32) NOT NULL REFERENCES usuario(login),
+	data timestamp default now()
+);
+
+create table pagamento (
+	id integer not null references pagamento_info(id),
+	venda_id integer not null references venda(id),
+	isvendedor boolean not null,
+	unique (venda_id, isvendedor),
+	primary key (id, venda_id, isvendedor)
+);
+
+
+create table grupo_usuario_info (
+	id serial not null primary key,
+	nome varchar(32) not null unique
+);
+
+create table grupo_usuario (
+	id integer not null references grupo_usuario_info(id),
+	usuario_login varchar(32) not null references usuario(login),
+	primary key (id, usuario_login)
+);
+
+create table tipos_permissao (
+	id serial primary key,
+	perm varchar(32) not null
+);
+
+create table permissoes (
+	id serial primary key,
+	perm int not null references tipos_permissao(id),
+	usuario_login varchar(32) references usuario(login),
+	grupo_id integer references grupo_usuario_info(id),
+	unique (perm, usuario_login),
+	unique (perm, grupo_id),
+	constraint usuario_login_xor_grupo_id check (
+		(usuario_login is not null and grupo_id is null) or
+		(usuario_login is null and grupo_id is not null)
+	)
+);
+
+
+
+
+
+-- VIEWS
+
+
+
+
+
+-- FUNCTIONS
+
+-- Verifica se o usuario existe, se sim, atualiza o token e insere o novo login no logins_usuario, retornando os dados do usuario o ultimo login e a ultima atualizacao do banco.
+CREATE OR REPLACE FUNCTION fn_do_user_login(p_login varchar(32), p_senha varchar(16), ip varchar(16), new_token text)
+RETURNS TABLE (login varchar(32), nome varchar(80), senha varchar(16), vend_comiss NUMERIC(10,2), last_login timestamp, token text, last_update integer) AS $$
+DECLARE
+    user_nome varchar(80);
+    user_senha varchar(16);
+    user_vend_comiss NUMERIC(10,2);
+    last_login timestamp;
+    last_update integer;
+BEGIN
+    -- Usuario
+    SELECT u.nome, u.senha, u.vend_comiss INTO user_nome, user_senha, user_vend_comiss from usuario u
+    WHERE u.login = p_login AND u.senha = p_senha;
+    IF NOT FOUND THEN
+        RETURN;
+    END IF;
+
+    -- Ultimo login
+    SELECT data INTO last_login
+    FROM logins_usuario
+    WHERE usuario_login = p_login
+    ORDER BY data DESC
+    LIMIT 1;
+
+    -- Atualiza o token
+    UPDATE usuario
+    SET token = new_token
+    WHERE usuario.login = p_login;
+
+    -- Insere o novo login no logins_usuario
+    INSERT INTO logins_usuario (usuario_login, ip)
+    VALUES (p_login, ip);
+
+    -- Pega a ultima atualizacao do banco
+    SELECT MAX(id) INTO last_update
+    FROM atualizacoes;
+
+    -- Retorna os dados do usuario e o ultimo login
+    RETURN QUERY SELECT p_login, user_nome, user_senha, user_vend_comiss, last_login, new_token, last_update;
+END;
+$$ LANGUAGE plpgsql;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+--ADD
+
+
+insert into usuario (login, nome, senha) values ('admin', 'administrador', '11111111');
+
+insert into grupo_usuario_info (nome) values ('admins');
+insert into grupo_usuario (id, usuario_login) values (1, 'admin');
+insert into tipos_permissao (id, perm) values 
+										(1,'Vender'),
+										(2,'Pagar'),
+										(3,'Ver Pagamento'),
+										(4,'Ver Relatorio Geral'),
+										(5,'Ver Relatorio Pessoal'),
+										(6,'Agendar Cliente'),
+										(7,'Notificar Cliente'),
+										(8,'Ver Local Certificado'),
+										(9,'Deletar Cronograma'),
+										(10,'Modificar Usuarios'),
+										(11,'Ver Permissoes de Usuario'),
+										(12,'Configurar Sistema'),
+										(13,'Gerenciar Certificado'),
+										(14,'Ver Advertências');
+insert into permissoes (grupo_id, perm) select 1, id from tipos_permissao where id not in (select id from permissoes where grupo_id = 1);
+
+
+
+
+insert into certificado (codi, nome, vencimento, local, empresa, versao) values (8,'Certificado De Teste','2024-05-27','pg1',false,1);
