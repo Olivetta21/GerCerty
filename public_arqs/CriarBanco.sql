@@ -139,7 +139,12 @@ CREATE VIEW vw_certificado_completo as (
     ) as rfb on rfb.codi = c.respRFB
 );
 
-
+CREATE VIEW vw_cronograma_completo as (
+    select cron.id, u.nome as unome, u.login as ulogin, cron.type, cron.nota,
+    TO_CHAR(cron.data, 'DD/MM/YYYY HH24:MI') AS data, cron.cert_codi, cron.cert_versao
+    from cronograma cron
+    join usuario u on u.login = cron.usuario_login
+);
 
 
 -- FUNCTIONS
@@ -217,6 +222,32 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION fn_switch_between_cert_versao(p_codi integer, p_versao integer, forward boolean)
+RETURNS TABLE (newversao integer) as $$
+DECLARE
+    r_newversao integer;
+BEGIN
+    IF forward THEN
+        SELECT min(cert_versao) INTO r_newversao FROM cronograma
+        WHERE cert_codi = p_codi AND cert_versao > p_versao;
+    ELSE
+        SELECT max(cert_versao) INTO r_newversao FROM cronograma
+        WHERE cert_codi = p_codi AND cert_versao < p_versao;
+    END IF;
+
+    IF NOT FOUND OR r_newversao IS NULL THEN
+        -- Se não encontrou uma nova versão, retorna a versão atual do certificado
+        IF forward THEN
+            select versao INTO r_newversao FROM certificado
+            WHERE codi = p_codi;
+        ELSE -- Mas se estiver indo para trás, retorna a versao do parametro
+            r_newversao := p_versao;
+        END IF;
+    END IF;
+
+    RETURN QUERY SELECT r_newversao;
+END;
+$$ LANGUAGE plpgsql;
 
 
 

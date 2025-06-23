@@ -10,44 +10,24 @@ if (isset($_POST['cert_codi']) && isset($_POST['cert_versao']) && isset($_POST['
     $cert_codi = json_decode($_POST['cert_codi'], true);
 
 
-    $sql = "";
-
-    if ($direction) $sql = "select min(cert_versao) as new from cronograma where cert_codi = :cert_codi and cert_versao > :cert_versao;";
-    else $sql = "select max(cert_versao) as new from cronograma where cert_codi = :cert_codi and cert_versao < :cert_versao;";
-
+    $sql = "SELECT newversao from fn_switch_between_cert_versao(:cert_codi, :cert_versao, :direction);";
 
     try {
-        $stmt = $pdo->prepare($sql);
-        
+        $stmt = $pdo->prepare($sql);        
         $stmt->bindParam(':cert_codi', $cert_codi, PDO::PARAM_INT);
         $stmt->bindParam(':cert_versao', $cert_versao, PDO::PARAM_INT);
+        $stmt->bindParam(':direction', $direction, PDO::PARAM_BOOL);
         $stmt->execute();
 
         $res = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($res[0]['newversao']){		
+			echo correctJson2(["sucess" => $res[0]['newversao']]);
+            exit;
+        }
         
-        // Retornar dados como JSON
-        header('Content-Type: application/json');
-        if ($res[0]['new']){		
-			echo correctJson2(["sucess" => $res[0]['new']]);
-            exit;
-        }
-        else {
-            if ($direction) { //pega a versao atual do certificado, caso a mesma nao conter cronogramas ainda.
-                $sql_act = "select versao from certificado where codi = :cert_codi;";
-                $stmt_act = $pdo->prepare($sql_act);
-                $stmt_act->bindParam(":cert_codi", $cert_codi, PDO::PARAM_INT);
-                $stmt_act->execute();
-                $res_act = $stmt_act->fetchAll(PDO::FETCH_COLUMN)[0];
-
-                if ($res_act > $cert_versao){
-                    echo correctJson2(["sucess" => $res_act]);
-                    exit;
-                }
-            }
-
-            echo correctJson("nenhum", "nenhum dado retornado");
-            exit;
-        }
+        echo correctJson("nenhum", "nenhum dado retornado");
+        exit;
 
     } catch (PDOException $e) {   
         echo correctJson("error", "erro ao recuperar cronogramas" . $e->getMessage());
@@ -60,7 +40,6 @@ if (isset($_POST['cert_codi']) && isset($_POST['cert_versao']) && isset($_POST['
 }
       
 
-echo correctJson("error", "nao foi possivel se conectar ao banco");
+echo correctJson("error", "endline");
 exit;
-
 ?>
