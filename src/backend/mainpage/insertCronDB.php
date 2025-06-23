@@ -35,27 +35,9 @@ if ($params === '1111') {
         }
     }
 
-    $sql_actVers = "select versao from certificado where codi = :cert_codi and versao = :cert_versao";
-
     try {
-        $stmt_av = $pdo->prepare($sql_actVers);
-        $stmt_av->bindParam(':cert_codi', $cert_codi, PDO::PARAM_INT);
-        $stmt_av->bindParam(':cert_versao', $cert_versao, PDO::PARAM_INT);
-        $stmt_av->execute();
-
-        if ($stmt_av->rowCount() < 1) {
-            echo correctJson("error", "Essa não é a versão atual!");
-            exit;
-        }
         
-        $sql = "insert into cronograma (cert_codi, cert_versao, type, usuario_login, nota) values (
-            :cert_codi, 
-            :cert_versao,
-            :type,
-            :usuario_login,
-            :nota
-        );";
-
+        $sql = "select fn_insert_cronograma(:cert_codi, :usuario_login, :cert_versao, :type, :nota);";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':cert_codi', $cert_codi, PDO::PARAM_STR);
         $stmt->bindParam(':usuario_login', $usuario_login, PDO::PARAM_STR);
@@ -67,21 +49,7 @@ if ($params === '1111') {
 
         if ($stmt->rowCount() > 0) {
             addAtualizacao("C2", $cert_codi, $credentials);
-			
-			if ($type != 'REVL') {//Envio do email
-				$data = [
-					"destinatario" => "arquivo@orteco.com.br",
-					"assunto" => "Cronograma Certificados Olivetta",
-					"mensagem" => "<p style='color: blue;'> O usuario " . $usuario_login . " inseriu o cronograma: " . $type . "</p>
-									<p style='color: gray;'>".
-                                        "Nota: " . $nota ."<br>".
-                                        "Certificado: " . $cert_codi ."<br>".
-                                        "Versão: " . $cert_versao .
-                                    "</p>"
-				];
-				enviarEmail($data, true);
-			}
-
+		
             echo correctJson2(["success" => true]);
             exit;
         }
@@ -100,7 +68,6 @@ else {
 }
       
 
-echo correctJson("error", "nao foi possivel se conectar ao banco");
+echo correctJson("error", "endline");
 exit;
-
 ?>

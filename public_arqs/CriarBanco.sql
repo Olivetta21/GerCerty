@@ -251,15 +251,52 @@ $$ LANGUAGE plpgsql;
 
 
 
+CREATE OR REPLACE FUNCTION fn_delete_cronograma(p_id integer)
+RETURNS TABLE (id integer, cert_codi integer) AS $$
+DECLARE
+    r_cron_id integer;
+    r_cert_codi integer;
+BEGIN
+    -- Certifica que esse cronograma pertence a versao atual do certificado
+    SELECT cron.id, c.codi INTO r_cron_id, r_cert_codi FROM cronograma cron
+    join certificado c on c.codi = cron.cert_codi and c.versao = cron.cert_versao
+    WHERE cron.id = p_id;
+
+    IF NOT FOUND OR r_cron_id IS NULL THEN
+        RETURN;
+    END IF;
+
+    -- Deleta
+    DELETE FROM cronograma WHERE cronograma.id = r_cron_id;
+
+    IF FOUND THEN
+        RETURN QUERY SELECT r_cron_id, r_cert_codi;
+    END IF;
+
+    RETURN;
+END;
+$$ LANGUAGE plpgsql;
 
 
+CREATE OR REPLACE FUNCTION fn_insert_cronograma(p_cert_codi integer, p_user_login varchar(32),p_cert_versao integer,p_type varchar(4), p_nota varchar(256))
+RETURNS SETOF cronograma AS $$
+DECLARE
+    newcronograma cronograma%ROWTYPE;
+    isActVers boolean;
+BEGIN
+    -- Ver se o cronograma esta pra ser inserido na versao atual do certificado
+    select true INTO isActVers from certificado where codi = p_cert_codi and versao = p_cert_versao;
+    IF NOT FOUND OR NOT isActVers THEN
+        RETURN;
+    END IF;
 
+    INSERT INTO cronograma (cert_codi, usuario_login, cert_versao, type, nota)
+    VALUES (p_cert_codi, p_user_login, p_cert_versao, p_type, p_nota)
+    RETURNING * INTO newcronograma;
 
-
-
-
-
-
+    RETURN NEXT newcronograma;
+END;
+$$ LANGUAGE plpgsql;
 
 
 
