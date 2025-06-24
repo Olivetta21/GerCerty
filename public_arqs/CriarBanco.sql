@@ -114,8 +114,8 @@ create table permissoes (
 
 
 -- VIEWS
-CREATE VIEW vw_certificado_completo as (
-    select c.codi as id, c.versao, 'escondido' as local, c.empresa, rfb.nome as resprfb, v.revl as usos, upper(c.nome) as nome, c.vencimento as venc, i.notf, i.agnd, i.prbl from certificado c
+CREATE VIEW vw_certificado_cronograma as (    
+    select c.codi as id, c.versao, 'escondido' as local, c.empresa, c.respRFB as respRFB_id, v.revl as usos, upper(c.nome) as nome, c.vencimento as venc, i.notf, i.agnd, i.prbl from certificado c
     left join (
         SELECT 
             cert_codi, cert_versao,
@@ -134,9 +134,14 @@ CREATE VIEW vw_certificado_completo as (
         WHERE type = 'REVL'
         group by cert_codi
     ) as v on v.cert_codi = c.codi
+);
+
+
+CREATE VIEW vw_certificado_completo as (
+    select c_cron.*, rfb.nome as resprfb from vw_certificado_cronograma c_cron
     left join (
         select codi, nome from certificado
-    ) as rfb on rfb.codi = c.respRFB
+    ) as rfb on rfb.codi = c_cron.respRFB_id
 );
 
 CREATE VIEW vw_cronograma_completo as (

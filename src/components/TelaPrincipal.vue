@@ -31,7 +31,7 @@
 
                             <div v-if="main_certs[mainModal_cIM].empresa" class="mmc-bc-infs">
                                 <p class="tiny1"> Responsável RFB </p>
-                                <p class="info1"> {{ main_certs[mainModal_cIM].respRFB ? main_certs[mainModal_cIM].respRFB : "não definido"}} </p>
+                                <p class="info1"> {{ main_certs[mainModal_cIM].resprfb ? main_certs[mainModal_cIM].resprfb : "não definido"}} </p>
                             </div>
                             
                             <div class="mmc-bc-infs">

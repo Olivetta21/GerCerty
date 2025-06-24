@@ -11,27 +11,9 @@ if (isset($_POST['cert_codis'])){
     $codis_placeholder = implode(',',array_fill(0, count($cert_codis), '?'));
 
     $sql = "
-    select c.codi, v.revl, i.notf, i.agnd, i.prbl
-    from certificado c
-    left join (
-        SELECT 
-            cert_codi, cert_versao,
-            bool_or(type = 'AGND') AS agnd,
-            bool_or(type = 'NOTF') AS notf,
-            count (*) FILTER (where type = 'PRBL') AS prbl
-        FROM 
-            cronograma
-        group by cert_codi, cert_versao
-    ) as i on i.cert_codi = c.codi and i.cert_versao = c.versao
-    left join (
-        SELECT 
-            cert_codi, count(*) as revl
-        FROM 
-            cronograma
-        WHERE type = 'REVL'
-        group by cert_codi
-    ) as v on v.cert_codi = c.codi
-    where c.codi in ($codis_placeholder);
+    select id as codi, usos as revl, notf, agnd, prbl
+    from vw_certificado_cronograma
+    where id in ($codis_placeholder);
     ";
     try {
         $stmt = $pdo->prepare($sql);
