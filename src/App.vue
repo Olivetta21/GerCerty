@@ -1,24 +1,21 @@
 <template>
     <ToastNotification/>
     <transition name="page" mode="out-in">
-        <TelaLogin v-if="actPage == Login"/>
-        <TelaGerCertificado v-else-if="actPage == GerCertificado"/>
-        <TelaPrincipal v-else-if="actPage == Main"/>
-        <TelaPagamento v-else-if="actPage == Payment"/>
-        <TelaRelatorio v-else-if="actPage == Relatorio"/>
-        <TelaVenda v-else-if="actPage == Venda"/>
-        <TelaSistema v-else-if="actPage == Sistema"/>
-        <TelaTeste v-else-if="actPage == Other"/>
-        <TelaNaoLocalizada v-else/>
+        <router-view></router-view>
     </transition>
     <div id="navigationbars">
         <div id="nvgb-buttons">
-            <button @click="Login.reEnter()"> &#8634; </button>
-            <button @click="GerenciaPaginas.back()"> &LeftArrow; </button>
-            <button @click="GerenciaPaginas.next()"> &RightArrow; </button>
+
+            <router-link to="/">Login</router-link> |
+            <router-link to="/inicio"> Inicio </router-link> |
+            <router-link to="/pagamentos"> Pagamentos </router-link> |
+            <router-link to="/relatorios"> Relatórios </router-link> |
+            <router-link to="/vendas"> Vendas </router-link> |
+            <router-link to="/sistema"> Sistema </router-link> |
+            
         </div>
         <div id="nvgb-historicocont" class="scroll-blue">
-            <span v-for="(h, index) in historico" :key="index" :class="['nvgb-historico', hisPos == index ? 'nvgb-histatual' : '']" @click="GerenciaPaginas.jumpToThisPage(index)"> {{ h.nome }} / </span>
+            
         </div>
     </div>
 </template>
@@ -26,15 +23,15 @@
 <script>
 import ToastNotification from './components/ToastNotification.vue';
 
-import TelaLogin from './components/TelaLogin.vue';
-import TelaGerCertificado from './components/TelaGerCertificado.vue';
-import TelaPrincipal from './components/TelaPrincipal.vue';
-import TelaPagamento from './components/TelaPagamento.vue';
-import TelaRelatorio from './components/TelaRelatorio.vue';
-import TelaVenda from './components/TelaVenda.vue';
-import TelaSistema from './components/TelaSistema.vue';
-import TelaTeste from './components/TelaTeste.vue';
-import TelaNaoLocalizada from './components/TelaNaoLocalizada.vue';
+//import TelaLogin from './components/TelaLogin.vue';
+//import TelaGerCertificado from './components/TelaGerCertificado.vue';
+//import TelaPrincipal from './components/TelaPrincipal.vue';
+//import TelaPagamento from './components/TelaPagamento.vue';
+//import TelaRelatorio from './components/TelaRelatorio.vue';
+//import TelaVenda from './components/TelaVenda.vue';
+//import TelaSistema from './components/TelaSistema.vue';
+//import TelaTeste from './components/TelaTeste.vue';
+//import TelaNaoLocalizada from './components/TelaNaoLocalizada.vue';
 
 import GerenciaPaginas from './frontend/scripts/Janelas/GerenciaPaginas';
 import Login from './frontend/scripts/Janelas/login/Login';
@@ -66,15 +63,15 @@ export default {
 	},
     components: {
         ToastNotification,
-        TelaLogin,
-        TelaGerCertificado,
-        TelaPrincipal,
-        TelaPagamento,
-        TelaRelatorio,
-        TelaVenda,
-        TelaSistema,
-        TelaTeste,
-        TelaNaoLocalizada
+    //    TelaLogin,
+    //    TelaGerCertificado,
+    //    TelaPrincipal,
+    //    TelaPagamento,
+    //    TelaRelatorio,
+    //    TelaVenda,
+    //    TelaSistema,
+    //    TelaTeste,
+    //    TelaNaoLocalizada
     }
 };
 </script>

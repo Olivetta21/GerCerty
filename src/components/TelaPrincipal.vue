@@ -1,108 +1,7 @@
 <template>
 	<div id="pagecontainer" :class="[Main.opcaoVisivel?'':'nooptions']">
 		<transition name="page" mode="out-in">
-		<div v-if="mainModal_isModalVisible" class="modal">
-			<div class="modal-content">
-                <div v-if="mainModal_loadingModal" class="loading-indicator">
-                    <div class="spinner"> </div>
-                </div>
-
-                <div v-else class="main-modal-certs modal-boxes"> 
-                    <div class="mmc-header"> 
-                        <span class="close" @click="MainModal.switchModal()">&times;</span>
-                        <h2 class="mmc-title">Certificado</h2>
-                    </div>
-                    <div v-if="main_certs" class="mmc-body scroll-blue">
-                        <div class="mmc-body-cert"> 
-                            <div class="mmc-bc-infs">
-                                <p class="tiny1"> Código </p>
-                                <p class="info1"> {{ main_certs[mainModal_cIM].id }} </p>
-                            </div>
-
-                            <div class="mmc-bc-infs">
-                                <p class="tiny1"> Nome </p>
-                                <p class="info1"> {{ main_certs[mainModal_cIM].nome }} </p>
-                            </div>
-                            
-                            <div class="mmc-bc-infs">
-                                <p class="tiny1"> Vencimento </p>
-                                <p class="info1"> {{ main_certs[mainModal_cIM].venc }} </p>
-                            </div>
-
-                            <div v-if="main_certs[mainModal_cIM].empresa" class="mmc-bc-infs">
-                                <p class="tiny1"> Responsável RFB </p>
-                                <p class="info1"> {{ main_certs[mainModal_cIM].resprfb ? main_certs[mainModal_cIM].resprfb : "não definido"}} </p>
-                            </div>
-                            
-                            <div class="mmc-bc-infs">
-                                <p class="tiny1"> Usos </p>
-                                <p class="info1"> {{ main_certs[mainModal_cIM].usos ? main_certs[mainModal_cIM].usos : 0 }} </p>
-                            </div>
-                            
-                            <div class="mmc-bc-infs">
-                                <p class="tiny1"> Local </p>
-                                <div v-if="main_certs[mainModal_cIM].localRevelado == 'carregando'" class="loading-indicator">
-                                    <div class="spinner"> </div>
-                                </div>
-                                <button v-else-if="!main_certs[mainModal_cIM].localRevelado" class="info1 no_tab" @click="MainModal.revelarLocal()"> Revelar Local </button>
-                                <p v-else-if="main_certs[mainModal_cIM].localRevelado" class="info1"> {{ main_certs[mainModal_cIM].local }} </p>
-                            </div>
-                            
-                            <div class="mmc-bc-infs">
-                                <p v-if="main_certs[mainModal_cIM].agnd || main_certs[mainModal_cIM].notf" class="info1 no_tab"> Cliente já notificado. </p>
-                                <button v-else class="info1 no_tab" @click="MainModal.showCronAdder('NOTF')"> Notifiquei o cliente </button>
-                            </div>
-                            
-                            <div class="mmc-bc-infs">
-                                <p v-if="main_certs[mainModal_cIM].agnd" class="info1 no_tab"> Cliente já agendou. </p>
-                                <button v-else class="info1 no_tab" @click="MainModal.showCronAdder('AGND')"> Agendei o cliente </button>
-                            </div>
-                            
-                            <div class="mmc-bc-infs">
-                                <p class="info1"> Avisos: {{ main_certs[mainModal_cIM].prbl }} </p>
-                                <button class="tiny1" @click="MainModal.showCronAdder('PRBL')"> Adicionar </button>
-                            </div>
-                        </div>
-                        <div class="mmc-crono-holder">
-                            <div class="mmc-title-cont">
-                                <span class="close" @click="MainModal.changeVersaoReOpen(mainModal_cIM, true)"> &rArr; </span>
-                                <span class="close"> {{ main_certs[mainModal_cIM].versao }} </span>
-                                <span class="close" @click="MainModal.changeVersaoReOpen(mainModal_cIM, false)"> &lArr; </span>
-                                <h2 class="mmc-title">Cronograma</h2>
-                            </div>
-
-                            <div v-if="mainModal_loadingModalCron" class="loading-indicator">
-                                <div class="spinner"> </div>
-                            </div>
-                            <p v-else-if="!main_certs[mainModal_cIM].crono" class="tiny1"> Nenhum cronograma para este certificado... </p>
-                            <div v-else class="mmc-body-cron scroll-blue ">
-                                <div :class="['mmc-body-cron-cron', cron.type]" v-for="(cron) in main_certs[mainModal_cIM].crono" :key="cron"> 
-                                    <p class="close" v-if="cron.type != 'REVL' && cron.ulogin == Login.login" @click="MainModal.deleteCronograma(cron.id)"> &times; </p>
-                                    <p class="tiny1">{{ cron.user }}</p>
-                                    <p class="info1 no_tab">{{ cron.type }}</p>
-                                    <p class="tiny1 nota">{{ cron.nota }}</p>
-                                    <p class="tiny1">{{ cron.data }}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div v-else> Índice inexistente! </div>
-                </div>
-                <div v-if="mainModal_isCronAdderVisible" class="modfSomething modal-boxes">
-                    <div class="ms-header-cont">
-                        <div class="close" @click="MainModal.closeCronAdder()"> &times; </div>
-                        <div class="ms-h-title"> {{ mainModal_cronTitulo }} </div>
-                    </div>
-                    <div class="ms-body-cont">
-                        <textarea v-model="mainModal_cronNota" class="ms-b-nota" name="nota" placeholder="Digite algo" required> </textarea>
-                    </div>
-                    <div class="ms-footer-cont">
-                        <button class="ms-f cancel" @click="MainModal.closeCronAdder()"> cancelar </button>
-                        <button class="ms-f confirm" @click="MainModal.addCronograma()"> confirmar </button>
-                    </div>
-                </div>
-			</div>           
-		</div>
+            <ModalCertificado v-if="MainModal.isModalVisible" />
 		</transition>
 	
 		<div id="cabecalho">
@@ -121,14 +20,14 @@
                 <p class="itvd A"> Intervado de: </p>
                 <input class="itvd B" 
                     type="date" 
-                    v-model="main_startDate" 
+                    v-model="Main.startDate" 
                     @keyup.enter="Main.setCertificados()" 
                     placeholder="Selecione uma data"
                 />
                 <p class="itvd C"> a </p>
                 <input class="itvd D" 
                     type="date" 
-                    v-model="main_endDate" 
+                    v-model="Main.endDate" 
                     @keyup.enter="Main.setCertificados()" 
                     placeholder="Selecione uma data"
                 />
@@ -136,14 +35,14 @@
             <div v-if="Main.typeSearch == 2" id="textCertSearch">
                 <input type="text" placeholder="Codigos dos Certificados" v-model="Main.codiCert">
             </div>	
-            <button class="itvd E" @click="Main.setCertificados()" :disabled="main_loadingCert">
-                {{ main_loadingCert ? "Espere..." : "Pesquisar" }}
+            <button class="itvd E" @click="Main.setCertificados()" :disabled="Main.loadingCert">
+                {{ Main.loadingCert ? "Espere..." : "Pesquisar" }}
             </button>
         </div>
 
         
         <div id="listacertholder" class="whitesoftshadow scroll-brown">
-            <div v-if="main_loadingCert" class="loading-indicator">
+            <div v-if="Main.loadingCert" class="loading-indicator">
                 <div class="spinner"> </div>
             </div>
             <div v-else id="listacert">
@@ -160,7 +59,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(crt, index) in main_certs" :key="index" @dblclick="MainModal.openCertificado(index)">
+                        <tr v-for="(crt, index) in Main.certs" :key="index" @dblclick="MainModal.openCertificado(index)">
                             <td> {{ crt.id }} </td>
                             <td> {{ crt.usos ? crt.usos : 0 }} </td>
                             <td class="col-fit-content"> {{ crt.nome }} </td>
@@ -216,6 +115,10 @@ import Relatorio from '../frontend/scripts/Janelas/relatorio/Relatorio';
 import Sistema from '../frontend/scripts/Janelas/sistema/Sistema';
 import GerCertificado from '../frontend/scripts/Janelas/gercertificado/GerCertificado';
 
+
+// Components
+import ModalCertificado from './TelaPrincipal/ModalCertificado.vue';
+
 export default {
 	data() {
 		return {
@@ -230,21 +133,9 @@ export default {
 
 
             Main,
-            main_loadingCert: Main.loadingCert_,
-            main_startDate: Main.startDate_,
-            main_endDate: Main.endDate_,
-            main_certs: Main.certs_,
                 MainModal,
-                mainModal_cIM: MainModal.cIM_,
-                mainModal_isModalVisible: MainModal.isModalVisible_,
-                mainModal_loadingModal: MainModal.loadingModal_, //não usado atualmente.
-                mainModal_loadingModalCron: MainModal.loadingModalCron_,
-                mainModal_isCronAdderVisible: MainModal.isCronAdderVisible_,
-                mainModal_cronTitulo: MainModal.cronTitulo_,
-                mainModal_cronNota: MainModal.cronNota_,
 
             Other,
-
 
             GerenciaPaginas,
 		};
@@ -252,7 +143,10 @@ export default {
     methods: {
         addToast,
         daysToExpire
-    }
+    },
+    components: {
+        ModalCertificado
+    },
 };
 </script>
 
