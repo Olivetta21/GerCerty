@@ -2,9 +2,9 @@
     <div id="logincontainer">
         <form @submit.prevent id="loginform">
             <p> Login </p>
-            <input v-model="login_Login" name="login" placeholder="digite seu login" required>
-            <input v-model="login_PassWd" name="senha" type="password" placeholder="digite sua senha" required>
-            <button v-if="!login_LoaVer" @click="Login.verifLogin()"> entrar </button>
+            <input v-model="Login.login" name="login" placeholder="digite seu login" required>
+            <input v-model="Login.password" name="senha" type="password" placeholder="digite sua senha" required>
+            <button v-if="!Login.loadingVerificando" @click="Login.verifLogin()"> entrar </button>
             <div v-else class="loading-indicator"> 
                 <div class="spinner"> </div>    
             </div>
@@ -18,10 +18,7 @@
     export default {
         data() {
             return {
-                Login,
-                login_Login: Login.login_,
-                login_PassWd: Login.password_,
-                login_LoaVer: Login.loadingVerificando_
+                Login
             }
         }
     }

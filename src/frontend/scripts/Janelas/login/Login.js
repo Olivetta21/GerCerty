@@ -1,15 +1,31 @@
 import { ref } from 'vue';
 import Janela from '../Janela';
 import pgUpdates from '../../pagesUpdates';
-import GerenciaPaginas from '../GerenciaPaginas';
-import Main from '../main/Main';
+
 import { addToast } from '../../toastNotification';
 import { sleep } from '../../utils';
 import { fetchJson } from '../../fetcher';
 import { noPermissionMsg, tratarRetornosApi } from '../../commonactions';
+import router from '@/router';
 
 class Login extends Janela {
     static nome = 'Login';
+    static entrando() {
+        document.title = "Certificados";
+        this.USERLOGGED = false;
+        this.login = '';
+        this.password = '';
+        this.token = '';
+        this.user_permissions = [];
+        //router.replace({ name: 'login' });
+        pgUpdates.stop();
+        console.log('Janela login foi aberta.');
+    }
+  
+    static saindo() {
+        this.password = '';
+        console.log('Janela login foi fechada.');
+    }
 
     static _login = ref('');
     static _password = ref('');
@@ -58,41 +74,16 @@ class Login extends Janela {
 
     static token = '';
 
-    static entrando() {
-        document.title = "Certificados";
-
-        this.USERLOGGED = false;
-        this.login = '';
-        this.password = '';
-        this.token = '';
-        this.user_permissions = [];
-
-        GerenciaPaginas.clearHistorico();
-
-        pgUpdates.stop();
-        console.log('Janela login foi aberta.');
-    }
-  
-    static saindo() {
-        this.password = '';
-        console.log('Janela login foi fechada.');
-    }
 
 
     static async reEnter(){
-        if (GerenciaPaginas.historicoPos < 1) return;
-
-        const to_back = GerenciaPaginas._pgAtual.value;
-
-        GerenciaPaginas.switchPG(Login);
+        const currentRoute = router.currentRoute.value;
+        router.replace({ name: 'login' });
         this.login = this.holdUserCred.login;
         this.password = this.holdUserCred.senha;
         await this.verifLogin();
-
-        if (to_back !== GerenciaPaginas._pgAtual.value) //neste momento o pgAtual é MainPage :)
-            GerenciaPaginas.switchPG(to_back);
+        router.push(currentRoute);
     }
-
 
     static async verifLogin() {
         if (!this.login || !this.password){
@@ -120,7 +111,7 @@ class Login extends Janela {
 
             this.holdUserCred.login = this.login;
             this.holdUserCred.senha = this.password;
-            GerenciaPaginas.switchPG(Main);							
+            router.push({ name: 'inicio' });						
 
             addToast('Bom dia', this.USERNAME + '!\nUltimo Login: ' + data['last_login'], 'success');
         }

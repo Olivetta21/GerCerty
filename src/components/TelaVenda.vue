@@ -1,7 +1,7 @@
 <template>
     <div class="vendacontainer">
         <div class="header">
-            <button class="whitesoftshadow" @click="GerenciaPaginas.back()"> &#10094; </button>
+            <button class="whitesoftshadow" @click="router.go(-1)"> &#10094; </button>
             <div class="whitesoftshadow"> 
                 Venda
             </div>
@@ -143,7 +143,7 @@
 <script>
 import Venda from '../frontend/scripts/Janelas/venda/Venda';
 import Login from '../frontend/scripts/Janelas/login/Login'
-import GerenciaPaginas from '../frontend/scripts/Janelas/GerenciaPaginas';
+import router from '@/router';
 
 //import { addToast } from '../frontend/scripts/toastNotification';
 
@@ -151,11 +151,11 @@ import GerenciaPaginas from '../frontend/scripts/Janelas/GerenciaPaginas';
 export default {
     data(){
         return {
+            router,
             
             InfV: Venda.InfoVenda_,
 
             Login,
-            GerenciaPaginas,
 
             Venda,
             certs: Venda.certs_,

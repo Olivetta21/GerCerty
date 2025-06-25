@@ -6,7 +6,7 @@
 	
 		<div id="cabecalho">
             <div> {{ Login.USERNAME }}</div>
-            <button @click="GerenciaPaginas.switchPG(Login)"> Sair </button>
+            <button @click="router.push({ name: 'login' })"> Sair </button>
 		</div>
         
         <div id="pesquisacert" class="whitesoftshadow scroll-brown">
@@ -76,12 +76,10 @@
         <div v-if="Main.opcaoVisivel" id="hoptcont" class="whitesoftshadow scroll-brown">
             <div class="close" @click="Main.swOpcaoVisivel()"> &times; </div>
             <div>
-                <button v-if="Login.verifPerm(13)" @click="GerenciaPaginas.switchPG(GerCertificado)"> Solicitar um novo Certificado </button>
-                <button v-if="Login.verifPerm(3)" @click="GerenciaPaginas.switchPG(Payment)" > Pagamentos </button>
-                <button v-if="Login.verifPerm(4) || Login.verifPerm(5)" @click="GerenciaPaginas.switchPG(Relatorio)" > Relatórios </button>
-                <button v-if="Login.verifPerm(1)" @click="GerenciaPaginas.switchPG(Venda)" > Vendas </button>
-                <button v-if="Login.verifPerm(14)"> Advertências </button>
-                <button v-if="Login.verifPerm(12)" @click="GerenciaPaginas.switchPG(Sistema)" > Sistema </button>
+                <button v-if="Login.verifPerm(3)" @click="router.push({ name: 'pagamentos' })" > Pagamentos </button>
+                <button v-if="Login.verifPerm(4) || Login.verifPerm(5)" @click="router.push({ name: 'relatorios' })" > Relatórios </button>
+                <button v-if="Login.verifPerm(1)" @click="router.push({ name: 'vendas' })" > Vendas </button>
+                <button v-if="Login.verifPerm(12)" @click="router.push({ name: 'sistema' })" > Sistema </button>
             </div>
         </div>
         <div v-else id="hoptcont" class="whitesoftshadow scroll-brown">
@@ -109,7 +107,6 @@ import Other from '../frontend/scripts/Janelas/other/Other';
 //#Pages
 
 
-import GerenciaPaginas from '../frontend/scripts/Janelas/GerenciaPaginas';
 import Venda from '../frontend/scripts/Janelas/venda/Venda';
 import Relatorio from '../frontend/scripts/Janelas/relatorio/Relatorio';
 import Sistema from '../frontend/scripts/Janelas/sistema/Sistema';
@@ -118,11 +115,14 @@ import GerCertificado from '../frontend/scripts/Janelas/gercertificado/GerCertif
 
 // Components
 import ModalCertificado from './TelaPrincipal/ModalCertificado.vue';
+import router from '@/router';
 
 export default {
 	data() {
 		return {
             tour: null,
+
+            router,
 
             Login,
             GerCertificado,
@@ -136,8 +136,6 @@ export default {
                 MainModal,
 
             Other,
-
-            GerenciaPaginas,
 		};
 	},
     methods: {

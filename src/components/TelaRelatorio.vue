@@ -2,7 +2,7 @@
     <div id="relatorioholder">
         <div class="agndvenda scroll-brown">
             <div class="intervdatarelatorio">
-                <button class="whitesoftshadow" @click="GerenciaPaginas.back()"> &#10094; </button>
+                <button class="whitesoftshadow" @click="router.go(-1)"> &#10094; </button>
                 <div class="whitesoftshadow">
                     <span> Seus dados de </span>
                     <input v-model="Relatorio.datas.in" type="date" placeholder="inicio" />
@@ -108,13 +108,13 @@ import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
 import Relatorio from "../frontend/scripts/Janelas/relatorio/Relatorio";
 import Login from "../frontend/scripts/Janelas/login/Login";
-import GerenciaPaginas from "../frontend/scripts/Janelas/GerenciaPaginas";
+import router from "@/router";
 
 export default {
     data() {
         return {
+            router,
             Relatorio,
-            GerenciaPaginas,
             Login,
         };
     },

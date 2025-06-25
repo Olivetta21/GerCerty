@@ -1,7 +1,7 @@
 <template>
     <div id="telasistemaholder">
         <div id="tsh-header" >
-            <button class="whitesoftshadow" @click="GerenciaPaginas.back()"> &#10094; </button>
+            <button class="whitesoftshadow" @click="router.go(-1)"> &#10094; </button>
             <div class="whitesoftshadow"> Sistema </div>
         </div>
         <div id="tsh-opcoescont" class="whitesoftshadow"> 
@@ -96,12 +96,12 @@
 
 <script>
 import Sistema from '@/frontend/scripts/Janelas/sistema/Sistema';
-import GerenciaPaginas from '../frontend/scripts/Janelas/GerenciaPaginas';
+import router from '@/router';
 
 export default {
     data() {
         return {
-            GerenciaPaginas,
+            router,
             Sistema,
 
 

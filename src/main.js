@@ -6,15 +6,10 @@ const app = createApp(App)
 
 app.config.globalProperties.$historicoNavegacao = []
 
-router.afterEach((to, from) => {
-  const historico = app.config.globalProperties.$historicoNavegacao
-  historico.push({
-    caminho: to.fullPath,
-    nome: to.name,
-    dataHora: new Date().toLocaleString()
-  })
-
-  console.log("de", from.fullPath)
+router.beforeEach((to, from, next) => {
+    if (from.matched.length > 0) from.meta.classe.saindo();
+    to.meta.classe.entrando();
+    next();
 })
 
 app.use(router).mount('#app')

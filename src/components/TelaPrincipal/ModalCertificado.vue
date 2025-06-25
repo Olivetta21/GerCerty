@@ -1,7 +1,7 @@
  <template>
     <div class="modal">
         <div class="modal-content">
-            <div v-if="mainModal_loadingModal" class="loading-indicator">
+            <div v-if="MainModal.loadingModal" class="loading-indicator">
                 <div class="spinner"> </div>
             </div>
 

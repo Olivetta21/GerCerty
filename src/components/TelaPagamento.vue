@@ -64,7 +64,7 @@
                     <button @click="Payment.getPaychecks()"> Mostrar Pagamentos </button>
                     <button @click="objArrToCSV2(paychecks, excelCol_pc)"> Excel </button>
                 </div>
-                <button @click="GerenciaPaginas.back()"> &#10094; </button>
+                <button @click="router.go(-1)"> &#10094; </button>
             </div>
             <div class="pcbody grid1-1">
                 <div class="beneholder grid2-0">
@@ -261,15 +261,15 @@
 
 <script>
 import Main from '../frontend/scripts/Janelas/main/Main';
-import GerenciaPaginas from '../frontend/scripts/Janelas/GerenciaPaginas';
 import Payment from '../frontend/scripts/Janelas/payment/Payment';
 import { prepareObjArrToCSV, generateCSV, numToStr } from '../frontend/scripts/utils';
+import router from "@/router";
 
 export default {
 	data() {
 		return {
+            router,
             Main,
-            GerenciaPaginas,
 
             Payment,
             payouts: Payment.payouts_,
