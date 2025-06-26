@@ -6,7 +6,7 @@
     display: grid;
 
     grid-template-areas: 
-    'header header header header'
+    'certificado venda venda venda'
     'certificado venda venda venda'
     'certificado venda venda venda'
     'certificado venda venda venda'

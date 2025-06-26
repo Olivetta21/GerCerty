@@ -281,36 +281,22 @@ td.col-fit-content, th.col-fit-content {
 
     display: grid;
     grid-template-areas: 
-    'head head head head head'
-    'itvd itvd itvd itvd hopt'
-    'lchold lchold lchold lchold hopt'
-    'lchold lchold lchold lchold hopt'
-    'lchold lchold lchold lchold hopt'
-    'lchold lchold lchold lchold hnotf'
-    'lchold lchold lchold lchold hnotf'
-    'lchold lchold lchold lchold hnotf'
-    'lchold lchold lchold lchold hnotf'
-    'lchold lchold lchold lchold hnotf'    
+    'itvd itvd itvd itvd itvd'
+    'lchold lchold lchold lchold lchold'
+    'lchold lchold lchold lchold lchold'
+    'lchold lchold lchold lchold lchold'
+    'lchold lchold lchold lchold lchold'
+    'lchold lchold lchold lchold lchold'
+    'lchold lchold lchold lchold lchold'
+    'lchold lchold lchold lchold lchold'
+    'lchold lchold lchold lchold lchold'
+    'lchold lchold lchold lchold lchold'  
     ;
 
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(10, 1fr);
 
     gap: 15px;
-}
-#pagecontainer.nooptions {
-    grid-template-areas: 
-    'head head head head head'
-    'itvd itvd itvd itvd hopt'
-    'lchold lchold lchold lchold lchold'
-    'lchold lchold lchold lchold lchold'
-    'lchold lchold lchold lchold lchold'
-    'lchold lchold lchold lchold lchold'
-    'lchold lchold lchold lchold lchold'
-    'lchold lchold lchold lchold lchold'
-    'lchold lchold lchold lchold lchold'
-    'lchold lchold lchold lchold lchold'    
-    ;
 }
 
 
@@ -323,7 +309,6 @@ td.col-fit-content, th.col-fit-content {
         grid-template-areas: 
         'head'
         'hopt'
-        'hopt'
         'itvd'
         'lchold'
         'lchold'
@@ -342,40 +327,13 @@ td.col-fit-content, th.col-fit-content {
         'lchold'
         'lchold'
         'lchold'
-        'hnotf'
-        'hnotf'
+        'lchold'
+        'lchold'
+        'lchold'
         ;
     
         grid-template-columns: repeat(1, 1fr);
         grid-template-rows: repeat(23, 1fr);
-    }
-    #pagecontainer.nooptions {
-        grid-template-areas: 
-        'head'
-        'hopt'
-        'itvd'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        'lchold'
-        ;
-                
     }
 }
 

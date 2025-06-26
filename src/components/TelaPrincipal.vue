@@ -4,11 +4,6 @@
             <ModalCertificado v-if="MainModal.isModalVisible" />
 		</transition>
 	
-		<div id="cabecalho">
-            <div> {{ Login.USERNAME }}</div>
-            <button @click="router.push({ name: 'login' })"> Sair </button>
-		</div>
-        
         <div id="pesquisacert" class="whitesoftshadow scroll-brown">
             <button class="verticaltext" @click="Main.swTypeSearch()">
                 {{ Main.typeSearchNome }}
@@ -73,23 +68,6 @@
             </div>
         </div>
 
-        <div v-if="Main.opcaoVisivel" id="hoptcont" class="whitesoftshadow scroll-brown">
-            <div class="close" @click="Main.swOpcaoVisivel()"> &times; </div>
-            <div>
-                <button v-if="Login.verifPerm(3)" @click="router.push({ name: 'pagamentos' })" > Pagamentos </button>
-                <button v-if="Login.verifPerm(4) || Login.verifPerm(5)" @click="router.push({ name: 'relatorios' })" > Relatórios </button>
-                <button v-if="Login.verifPerm(1)" @click="router.push({ name: 'vendas' })" > Vendas </button>
-                <button v-if="Login.verifPerm(12)" @click="router.push({ name: 'sistema' })" > Sistema </button>
-            </div>
-        </div>
-        <div v-else id="hoptcont" class="whitesoftshadow scroll-brown">
-            <button @click="Main.swOpcaoVisivel()"> &#8801; </button>
-        </div>
-
-        <div v-if="Main.opcaoVisivel" id="hnotifcont" class="whitesoftshadow scroll-brown">
-            <p v-for="(notif, index) in Main.notifications" :key="index" class="hnotif"> {{ notif }} </p>
-        </div>
-        <div v-else id="hnotifcont" style="display: none;" class="whitesoftshadow scroll-brown"> </div>
 		
 	</div>
 </template>

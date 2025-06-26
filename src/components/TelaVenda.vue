@@ -1,11 +1,5 @@
 <template>
     <div class="vendacontainer">
-        <div class="header">
-            <button class="whitesoftshadow" @click="router.go(-1)"> &#10094; </button>
-            <div class="whitesoftshadow"> 
-                Venda
-            </div>
-        </div>
         <div v-if="certsLoading" class="loading-indicator certs">
             <div class="spinner"> </div>
         </div>    

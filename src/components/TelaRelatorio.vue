@@ -2,7 +2,6 @@
     <div id="relatorioholder">
         <div class="agndvenda scroll-brown">
             <div class="intervdatarelatorio">
-                <button class="whitesoftshadow" @click="router.go(-1)"> &#10094; </button>
                 <div class="whitesoftshadow">
                     <span> Seus dados de </span>
                     <input v-model="Relatorio.datas.in" type="date" placeholder="inicio" />

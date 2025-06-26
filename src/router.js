@@ -14,14 +14,25 @@ import TelaPagamento from './components/TelaPagamento.vue'
 import TelaRelatorio from './components/TelaRelatorio.vue'
 import TelaVenda from './components/TelaVenda.vue'
 import TelaSistema from './components/TelaSistema.vue'
+import TelaTeste from './components/TelaTeste.vue'
+import Other from './frontend/scripts/Janelas/other/Other'
+import CabecalhoPaginas from './components/CabecalhoPaginas.vue'
 
 const routes = [
-  { path: '/', name: 'login', component: TelaLogin, meta: { classe: Login} },
-  { path: '/inicio', name: 'inicio', component: TelaPrincipal, meta: { classe: Main} },
-  { path: '/pagamentos', name: 'pagamentos', component: TelaPagamento, meta: { classe: Payment} },
-  { path: '/relatorios', name: 'relatorios', component: TelaRelatorio, meta: { classe: Relatorio} },
-  { path: '/vendas', name: 'vendas', component: TelaVenda, meta: { classe: Venda} },
-  { path: '/sistema', name: 'sistema', component: TelaSistema, meta: { classe: Sistema} }
+  { path: '/login', name: 'login', component: TelaLogin, meta: { classe: Login} },
+  
+  {
+    path: '/site',
+    component: CabecalhoPaginas,
+    children: [
+        { path: 'inicio', name: 'inicio', component: TelaPrincipal, meta: { classe: Main, requiresAuth: true } },
+        { path: 'pagamentos', name: 'pagamentos', component: TelaPagamento, meta: { classe: Payment, requiresAuth: true } },
+        { path: 'relatorios', name: 'relatorios', component: TelaRelatorio, meta: { classe: Relatorio, requiresAuth: true } },
+        { path: 'vendas', name: 'vendas', component: TelaVenda, meta: { classe: Venda, requiresAuth: true } },
+        { path: 'sistema', name: 'sistema', component: TelaSistema, meta: { classe: Sistema, requiresAuth: true } },
+        { path: 'teste', name: 'teste', component: TelaTeste, meta: { classe: Other } }
+    ]
+  }
 ]
 
 const router = createRouter({
