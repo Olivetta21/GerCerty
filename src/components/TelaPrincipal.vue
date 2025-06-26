@@ -4,8 +4,8 @@
             <ModalCertificado v-if="MainModal.isModalVisible" />
 		</transition>
 	
-        <div id="pesquisacert" class="whitesoftshadow scroll-brown">
-            <button class="verticaltext" @click="Main.swTypeSearch()">
+        <div id="pesquisacert" class="soft-panel">
+            <button @click="Main.swTypeSearch()">
                 {{ Main.typeSearchNome }}
             </button>
             <div v-if="Main.typeSearch == 0" id="textCertSearch">
@@ -36,11 +36,11 @@
         </div>
 
         
-        <div id="listacertholder" class="whitesoftshadow scroll-brown">
+        <div id="listacertholder" class="soft-panel">
             <div v-if="Main.loadingCert" class="loading-indicator">
                 <div class="spinner"> </div>
             </div>
-            <div v-else id="listacert">
+            <div v-else id="listacert" class="scroll-brown">
                 <table>
                     <thead>
                         <tr>
@@ -76,44 +76,20 @@
 import { addToast } from '../frontend/scripts/toastNotification';
 import { daysToExpire } from '../frontend/scripts/utils';
 
-//Pages
-import Login from '../frontend/scripts/Janelas/login/Login';
 import Main from '../frontend/scripts/Janelas/main/Main';
-/**/import MainModal from '../frontend/scripts/Janelas/main/MainModal';
-import Payment from '../frontend/scripts/Janelas/payment/Payment';
-import Other from '../frontend/scripts/Janelas/other/Other';
-//#Pages
+import MainModal from '../frontend/scripts/Janelas/main/MainModal';
 
-
-import Venda from '../frontend/scripts/Janelas/venda/Venda';
-import Relatorio from '../frontend/scripts/Janelas/relatorio/Relatorio';
-import Sistema from '../frontend/scripts/Janelas/sistema/Sistema';
-import GerCertificado from '../frontend/scripts/Janelas/gercertificado/GerCertificado';
-
-
-// Components
 import ModalCertificado from './TelaPrincipal/ModalCertificado.vue';
-import router from '@/router';
+import router from '../router';
 
 export default {
 	data() {
 		return {
             tour: null,
-
             router,
-
-            Login,
-            GerCertificado,
-            Payment,
-            Relatorio,
-            Venda,
-            Sistema,
-
 
             Main,
                 MainModal,
-
-            Other,
 		};
 	},
     methods: {

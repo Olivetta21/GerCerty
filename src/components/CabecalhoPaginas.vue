@@ -46,36 +46,41 @@ export default {
         display: flex;
         flex-direction: column;
 
-        padding: 10px;
+        padding: var(--padding-normal);
     }
 
     #cabecalho-hori {
         width: 100%;
-        height: 50px;
+        height: 80px;
+        
         background-color: var(--fundo-principal);
         display: flex;
-        justify-content: center;
+        justify-content: flex-end;
         align-items: center;
 
         border: 1px solid var(--cor-borda-escuro);
+
+        padding: var(--padding-normal);
+        gap: 10px;
     }
 
     #conteudo {
         display: flex;
         flex-direction: row;
-        height: calc(100% - 50px);
+        height: calc(100% - 80px);
     }
 
     #cabecalho-vert {
         width: 200px;
-        background-color: var(--fundo-principal);
+        background-color: var(--fundo-principal-claro);
         display: flex;
         flex-direction: column;
-        justify-content: center;
-        align-items: center;
 
         border: 1px solid var(--cor-borda-escuro);
         border-top: none;
+
+        padding: calc(var(--padding-normal) * 0.5);
+        gap: 10px;
     }
 
     #pagina {

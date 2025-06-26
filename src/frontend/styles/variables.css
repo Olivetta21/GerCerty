@@ -8,7 +8,10 @@
     --cor-borda-claro: sandybrown;
     --background-geral: rgba(0, 187, 255, 0.60);
     --fundo-principal: wheat;
+    --fundo-principal-claro: rgb(255, 245, 228);
     --fundo-secundario: rgb(200, 240, 255);
     --cor-letra-escuro: brown;
     --cor-letra-claro: wheat;
+
+    --padding-normal: 10px;
 }

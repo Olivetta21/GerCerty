@@ -19,7 +19,7 @@ import Other from './frontend/scripts/Janelas/other/Other'
 import CabecalhoPaginas from './components/CabecalhoPaginas.vue'
 
 const routes = [
-  { path: '/login', name: 'login', component: TelaLogin, meta: { classe: Login} },
+  { path: '/', name: 'login', component: TelaLogin, meta: { classe: Login} },
   
   {
     path: '/site',
