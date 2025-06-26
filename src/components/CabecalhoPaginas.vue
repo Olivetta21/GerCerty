@@ -58,7 +58,7 @@ export default {
         justify-content: flex-end;
         align-items: center;
 
-        border: 1px solid var(--cor-borda-escuro);
+        border: 3px solid var(--cor-borda-escuro);
 
         padding: var(--padding-normal);
         gap: 10px;
@@ -68,6 +68,7 @@ export default {
         display: flex;
         flex-direction: row;
         height: calc(100% - 80px);
+        width: 100%;
     }
 
     #cabecalho-vert {
@@ -76,7 +77,7 @@ export default {
         display: flex;
         flex-direction: column;
 
-        border: 1px solid var(--cor-borda-escuro);
+        border: 3px solid var(--cor-borda-escuro);
         border-top: none;
 
         padding: calc(var(--padding-normal) * 0.5);
@@ -85,6 +86,7 @@ export default {
 
     #pagina {
         flex: 1;
+        width: calc(100% - 200px);
     }
 
 </style>

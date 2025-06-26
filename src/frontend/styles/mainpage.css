@@ -310,35 +310,15 @@ td.col-fit-content, th.col-fit-content {
 
 #intervData {
     flex: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
     
     color: brown;
 
     font-size: x-large;
-
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(1em, 1fr));
     gap: 2px;
-}
-.itvd.A {
-    grid-column: span 11;
-    grid-row: auto;
-}
-.itvd.B {
-    grid-column: span 10;
-    grid-row: auto;
-}
-.itvd.C {
-    grid-column: span 1;
-    grid-row: auto;
-}
-.itvd.D {
-    grid-column: span 10;
-    grid-row: auto;
-}
-.itvd.E {
-    grid-column: span 7;
-    grid-row: auto;
-    height: 100%;
 }
 
 #textCertSearch {
