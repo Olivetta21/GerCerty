@@ -4,8 +4,8 @@
             <ModalCertificado v-if="MainModal.isModalVisible" />
 		</transition>
 	
-        <div id="pesquisacert" class="soft-panel">
-            <button @click="Main.swTypeSearch()">
+        <form @submit.prevent id="pesquisacert" class="soft-panel">
+            <button type="button" @click="Main.swTypeSearch()">
                 {{ Main.typeSearchNome }}
             </button>
             <div v-if="Main.typeSearch == 0" id="textCertSearch">
@@ -15,25 +15,23 @@
                 <p class="itvd A"> Intervado de: </p>
                 <input class="itvd B" 
                     type="date" 
-                    v-model="Main.startDate" 
-                    @keyup.enter="Main.setCertificados()" 
+                    v-model="Main.startDate"
                     placeholder="Selecione uma data"
                 />
                 <p class="itvd C"> a </p>
                 <input class="itvd D" 
                     type="date" 
-                    v-model="Main.endDate" 
-                    @keyup.enter="Main.setCertificados()" 
+                    v-model="Main.endDate"
                     placeholder="Selecione uma data"
                 />
             </div>
             <div v-if="Main.typeSearch == 2" id="textCertSearch">
                 <input type="text" placeholder="Codigos dos Certificados" v-model="Main.codiCert">
             </div>	
-            <button class="itvd E" @click="Main.setCertificados()" :disabled="Main.loadingCert">
+            <button type="submit" class="itvd E" @click="Main.setCertificados()" :disabled="Main.loadingCert">
                 {{ Main.loadingCert ? "Espere..." : "Pesquisar" }}
             </button>
-        </div>
+        </form>
 
         
         <div id="listacertholder" class="soft-panel">

@@ -1,6 +1,5 @@
 .vendacontainer {
     padding: 10px;
-    background-color: #00bbff79;
 
     height: 100%;
     display: grid;
@@ -41,11 +40,7 @@
     align-items: center ;
 }
 
-.certs {
-    background-color: white;
-    border-radius: 1em;
-    box-shadow: var(--sombraSuave);
-    
+.certs {    
     grid-area: certificado;
 
     display: flex;
@@ -69,11 +64,6 @@
 
 
 .venda {
-    background-color: white;
-    border-radius: 1em;
-    
-    box-shadow: var(--sombraSuave);
-
     grid-area: venda;
 
     display: flex;

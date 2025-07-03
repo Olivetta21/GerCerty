@@ -1,11 +1,11 @@
 <template> 
     <div id="paymentcont" class="scroll-brown">
         <div class="payoutsholder grid0-0">
-            <div class="paybutton grid1-0b" >
+            <div class="paybutton grid1-0b soft-panel" >
                 <div> Total Pagamento no Periodo: {{ Payment.totalPagamentos }} </div>
                 <button @click="Payment.getPayouts()" :disabled="loadingPO"> recarregar </button>
             </div>
-            <div class="payoutscont scroll-brown grid1-1b">
+            <div class="payoutscont scroll-brown grid1-1b soft-panel">
                 <div v-if="loadingPO" class="loading-indicator">
                     <div class="spinner"></div>
                 </div>
@@ -28,7 +28,7 @@
                     </table>
                 </div>
             </div>
-            <div class="payoutscont scroll-brown grid1-2b">
+            <div class="payoutscont scroll-brown grid1-2b soft-panel">
                 <div class="payoutstableholder">
                     <table>
                         <thead>
@@ -48,13 +48,13 @@
                     </table>
                 </div>
             </div>
-            <div class="paybutton grid1-3b">
+            <div class="paybutton grid1-3b soft-panel">
                 <button @click="Payment.efetuarPagamento()"> Confirmar Pagamento de {{ Payment.totalPendingPay }}</button>    
             </div>
         </div>
         <div class="paycheckholder grid0-1">
             <div class="pcheader grid1-0">
-                <div class="paybutton">
+                <div class="paybutton soft-panel">
                     <div class="pcheaderdatesearch">
                         <span> Periodo de </span>
                         <input v-model="Payment.datas.in" type="date" placeholder="inicio" />
@@ -68,7 +68,7 @@
             </div>
             <div class="pcbody grid1-1">
                 <div class="beneholder grid2-0">
-                    <div class="benecont scroll-brown grid3-0"> 
+                    <div class="benecont scroll-brown grid3-0 soft-panel"> 
                         <div v-if="loadingPC" class="loading-indicator">
                             <div class="spinner"></div>
                         </div>
@@ -149,7 +149,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="paybutton i2 grid3-1">
+                    <div class="paybutton i2 grid3-1 soft-panel">
                         <div>
                             <div> Beneficiados Pagos: {{ Payment.totalVendasPC[2] }}</div>
                             <div> Beneficiados não Pagos: {{ Payment.totalVendasPC[3] }} </div>
@@ -158,7 +158,7 @@
                     </div>
                 </div>
                 <div class="beneholder grid2-1">
-                    <div class="benecont scroll-brown grid3-0">
+                    <div class="benecont scroll-brown grid3-0 soft-panel">
                         <div v-if="loadingPC" class="loading-indicator">
                             <div class="spinner"></div>
                         </div>
@@ -239,7 +239,7 @@
                             </table>
                         </div>
                     </div>
-                    <div class="paybutton i2 grid3-1">
+                    <div class="paybutton i2 grid3-1 soft-panel">
                         <div>
                             <div> Vendedores Pagos: {{ Payment.totalVendasPC[0] }}</div>
                             <div> Vendedores não Pagos: {{ Payment.totalVendasPC[1] }} </div>
@@ -248,7 +248,7 @@
                     </div>
                 </div>
             </div>
-            <div class="paybutton grid1-2">
+            <div class="paybutton grid1-2 soft-panel">
                 <div>
                     <div> Total Pago: {{ (Number(Payment.totalVendasPC[0]) + Number(Payment.totalVendasPC[2])).toFixed(2) }} </div>
                     <div> Total não Pago: {{ (Number(Payment.totalVendasPC[1]) + Number(Payment.totalVendasPC[3])).toFixed(2) }} </div>

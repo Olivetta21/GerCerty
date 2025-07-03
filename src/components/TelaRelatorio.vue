@@ -2,14 +2,14 @@
     <div id="relatorioholder">
         <div class="agndvenda scroll-brown">
             <div class="intervdatarelatorio">
-                <div class="whitesoftshadow">
+                <div class="soft-panel">
                     <span> Seus dados de </span>
                     <input v-model="Relatorio.datas.in" type="date" placeholder="inicio" />
                     <span> a </span>
                     <input v-model="Relatorio.datas.fi" type="date" placeholder="fim" />
                 </div>
             </div>
-            <div class="blockwtitleatable agendsfeitos whitesoftshadow">
+            <div class="blockwtitleatable agendsfeitos soft-panel">
                 <div class="agndfeitosearch">
                     <p> Agendamentos feito por você </p>
                     <button @click="Relatorio.setRelAgBeFi()"> Mostrar </button>
@@ -42,7 +42,7 @@
                     </div>
                 </div>
             </div>
-            <div class="blockwtitleatable pagtorecebido whitesoftshadow">
+            <div class="blockwtitleatable pagtorecebido soft-panel">
                 <div class="agndfeitosearch">
                     <p> Historico dos seus pagamentos </p>
                     <button @click="Relatorio.setRelPaFeBe()"> Mostrar </button>
@@ -71,21 +71,21 @@
             </div>
         </div>
         <div v-if="Login.verifPerm(4)" class="relgraficoscont scroll-brown">
-            <div class="whitesoftshadow bmv">
+            <div class="soft-panel bmv">
                 <p> Ações mais executadas </p>
                 <div>
                     <canvas ref="cronoMaisExecutados"> </canvas> 
                 </div>
             </div>
 
-            <div class="whitesoftshadow bmv">
+            <div class="soft-panel bmv">
                 <p> Top 20 certificados mais visualizados </p>
                 <div>
                     <canvas ref="certMaisUsados"> </canvas> 
                 </div>
             </div>
             
-            <div class="whitesoftshadow bmv">
+            <div class="soft-panel bmv">
                 <p> Top 10 beneficiarios com maiores lucros </p>
                 <div>
                     <canvas ref="maioresLucrosBenefs"> </canvas> 
@@ -93,7 +93,7 @@
             </div>
         </div>
         <div v-else class="relgraficoscont scroll-brown">
-            <div class="whitesoftshadow bmv"> 
+            <div class="soft-panel bmv"> 
                 <h1> Você está sem permissão para ver os relatorios gerais neste momento. </h1>
                 <h2> Peça à um administrador para que você consiga ver. </h2>
             </div>
@@ -127,7 +127,6 @@ export default {
         }
     },
     beforeUnmount() {
-        console.error("UNMOUNT");
         Relatorio.stopResizeListener();
         Relatorio.destroyAllRels();
     },

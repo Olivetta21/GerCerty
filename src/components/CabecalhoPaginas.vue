@@ -6,7 +6,7 @@
         </div>
         <div id="conteudo">
             <div id="cabecalho-vert"> 
-                <button v-if="Login.verifPerm(3)" @click="router.push({ name: 'inicio' })" > Inicio </button>
+                <button @click="router.push({ name: 'inicio' })" > Inicio </button>
                 <button v-if="Login.verifPerm(3)" @click="router.push({ name: 'pagamentos' })" > Pagamentos </button>
                 <button v-if="Login.verifPerm(4) || Login.verifPerm(5)" @click="router.push({ name: 'relatorios' })" > Relatórios </button>
                 <button v-if="Login.verifPerm(1)" @click="router.push({ name: 'vendas' })" > Vendas </button>

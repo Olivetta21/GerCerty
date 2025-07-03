@@ -1,14 +1,14 @@
 <template>
     <div class="vendacontainer">
-        <div v-if="certsLoading" class="loading-indicator certs">
+        <div v-if="certsLoading" class="loading-indicator certs soft-panel">
             <div class="spinner"> </div>
         </div>    
-        <div v-else class="certs scroll-brown"> 
-            <div class="c-head"> 
-                <button @click="Venda.switchSearchType()"> Consulta por {{ Venda.tipoConsultName }}</button>
+        <div v-else class="certs scroll-brown soft-panel"> 
+            <form @submit.prevent class="c-head"> 
+                <button type="button" @click="Venda.switchSearchType()"> Consulta por {{ Venda.tipoConsultName }}</button>
                 <input v-if="tipoConsult == 3" type="text" name="certNomePesq" id="certNomePesq" v-model="certNomePesq">
-                <button @click="Venda.searchCert()"> &#128269; </button>
-            </div>
+                <button type="submit" @click="Venda.searchCert()"> &#128269; </button>
+            </form>
             <div class="c-table-holder scroll-brown"> 
                 <div v-if="certs != null && certs.length > 0" class="c-table-cont"> 
                     <table class="c-table">
@@ -28,13 +28,13 @@
                 </div>
             </div>
         </div>
-        <div v-if="InfV.loading" class="loading-indicator venda">
+        <div v-if="InfV.loading" class="loading-indicator venda soft-panel">
             <div class="spinner"></div>
         </div>
-        <div v-else-if="!InfV.isVending" class="venda notvending">
+        <div v-else-if="!InfV.isVending" class="venda notvending soft-panel">
             <div> Por favor, selecione um certificado. </div>
         </div>
-        <div v-else class="venda scroll-brown">
+        <div v-else class="venda scroll-brown soft-panel">
             <div class="pessoa">
                 <table>
                     <thead>
