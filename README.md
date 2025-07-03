@@ -1,24 +1,25 @@
-# gercert
+# GerCerty
 
 ## Project setup
 ```
-npm install
+>>> cd <ProjFolder>
+>>> npm install
+```
+```
+>>> cd ./Sensitive/
+>>> composer install
+```
+### Development
+```
+>>> cd <ProjFolder>
+>>> npm run serve
 ```
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+#
+#
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+# OBS:
+## 1 - Point to official funcs.php
+In ./Src/backend/funcs.php you have to point the official 'funcs.php' to the 'Sensitive' folder.
+## 2 - Point to DotEnv folder
+In the official 'funcs.php' file, point to the DotEnv folder (it could be the \_\_\_DIR\_\_\_ folder anyway).
