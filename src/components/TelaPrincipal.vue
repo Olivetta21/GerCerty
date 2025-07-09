@@ -27,10 +27,11 @@
             </div>
             <div v-if="Main.typeSearch == 2" id="textCertSearch">
                 <input type="text" placeholder="Codigos dos Certificados" v-model="Main.codiCert">
-            </div>	
+            </div>
             <button type="submit" class="itvd E" @click="Main.setCertificados()" :disabled="Main.loadingCert">
                 {{ Main.loadingCert ? "Espere..." : "Pesquisar" }}
             </button>
+            <button v-if="Main.certs.length > 0" type="button" @click="objArrToCSV2(Main.certs)"> &#8292; &#8609; &#8292; </button>
         </form>
 
         
@@ -80,6 +81,8 @@ import MainModal from '../frontend/scripts/Janelas/main/MainModal';
 import ModalCertificado from './TelaPrincipal/ModalCertificado.vue';
 import router from '../router';
 
+import { prepareObjArrToCSV, generateCSV } from '../frontend/scripts/utils';
+
 export default {
 	data() {
 		return {
@@ -88,11 +91,45 @@ export default {
 
             Main,
                 MainModal,
+
+
 		};
 	},
     methods: {
         addToast,
-        daysToExpire
+        daysToExpire,
+
+        
+        objArrToCSV2(a){
+            let newObjects = [];
+
+            const titulo = {
+                id: "Codigo",
+                usos: "Usos",
+                nome: "Nome",
+                venc: "Vencimento",
+                notf: "Notificado",
+                agnd: "Agendado",
+                prbl: "Avisos",
+            };
+
+            a.forEach(e => {
+                newObjects.push({
+                    id: e.id,
+                    usos: e.usos ? e.usos : 0,
+                    nome: e.nome,
+                    venc: e.venc,
+                    notf: e.notf ? "Sim": "",
+                    agnd: e.agnd ? "Sim": "",
+                    prbl: e.prbl ? "Sim": "",
+                });
+            });
+
+
+            const str_body = prepareObjArrToCSV(newObjects, titulo);
+
+            generateCSV(str_body, "CertificadosFiltrados");
+        },
     },
     components: {
         ModalCertificado
