@@ -12,7 +12,7 @@ export function floatData(mod) {
     return formatarData(data);
 }
 
-export function daysToExpire(data_str){
+export function daysToExpire(data_str) {
     const data = new Date(data_str);
     const hoje = new Date();
 
@@ -22,7 +22,7 @@ export function daysToExpire(data_str){
     return Math.floor(diffMs / 86400000);
 }
 
-export function getMonthInterval(data, isInicio){
+export function getMonthInterval(data, isInicio) {
 
     if (isInicio) {
         const inicio = data;
@@ -42,7 +42,7 @@ export function sleep(ms) {
 }
 
 export function prepareObjArrToCSV(conteudo, colunas) {
-    if (!Array.isArray(conteudo) || !conteudo.length || !colunas ) return;
+    if (!Array.isArray(conteudo) || !conteudo.length || !colunas) return;
 
     const selectedColumns = Object.keys(colunas);
     const headers = selectedColumns.map(col => colunas[col]);
@@ -60,19 +60,46 @@ export function prepareObjArrToCSV(conteudo, colunas) {
     return csvContent;
 }
 
-export function generateCSV(csvContent, titulo){
+export function generateCSV(csvContent, titulo) {
     if (!titulo) titulo = 'sem_titulo';
 
     const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', titulo+'.csv');
+    link.setAttribute('download', titulo + '.csv');
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
 }
 
-export function numToStr(num){
+export function numToStr(num) {
     return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+export function validarTelefone(telefone) {
+    if (!telefone) return false;
+
+    const numero = telefone.replace(/\D/g, '');
+
+    // Deve ter 10 ou 11 dígitos
+    if (!/^\d{10,11}$/.test(numero)) {
+        return false;
+    }
+
+    // DDD não pode começar com 0
+    const ddd = numero.substring(0, 2);
+    if (ddd.startsWith('0')) {
+        return false;
+    }
+
+    // Celular com 11 dígitos deve começar com 9
+    if (numero.length === 11) {
+        const nonoDigito = numero[2];
+        if (nonoDigito !== '9') {
+            return false;
+        }
+    }
+
+    return true;
 }

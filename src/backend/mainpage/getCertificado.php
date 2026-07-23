@@ -33,6 +33,13 @@ try {
         exit;
     }
 
+    $info = "";
+    if ($p_codi) $info .= "codi = " . $p_codi . "; ";
+    if ($p_nome) $info .= "nome = " . $p_nome . "; ";
+    if ($p_dataini) $info .= "dataini = " . $p_dataini . "; ";
+    if ($p_datafim) $info .= "datafim = " . $p_datafim . "; ";
+    auditar($credentials, "Busca de Certificado", trim($info));
+
     $sql = "SELECT * FROM fn_get_certificado_filtered(:p_codi, :p_nome, :p_dataini, :p_datafim)";
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':p_codi', $p_codi, PDO::PARAM_STR);

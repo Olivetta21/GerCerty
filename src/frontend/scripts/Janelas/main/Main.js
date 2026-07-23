@@ -24,28 +24,28 @@ class Main extends Janela {
 
 
     //getters
-    static get opcaoVisivel_() {return this._opcaoVisivel}
-    static get opcaoVisivel() {return this._opcaoVisivel.value}
+    static get opcaoVisivel_() { return this._opcaoVisivel }
+    static get opcaoVisivel() { return this._opcaoVisivel.value }
 
-    static get loadingCert_() {return this._loadingCert}
-    static get loadingCert() {return this._loadingCert.value}
-    
-    static get startDate_() {return this._startDate}
-    static get startDate() {return this._startDate.value}
-    
-    static get endDate_() {return this._endDate}
-    static get endDate() {return this._endDate.value}
-    
-    static get nomeCert_() {return this._nomeCert}
-    static get nomeCert() {return this._nomeCert.value}
-    
-    static get codiCert_() {return this._codiCert}
-    static get codiCert() {return this._codiCert.value}
+    static get loadingCert_() { return this._loadingCert }
+    static get loadingCert() { return this._loadingCert.value }
 
-    static get certs_() {return this._certs}
-    static get certs() {return this._certs.value}
+    static get startDate_() { return this._startDate }
+    static get startDate() { return this._startDate.value }
 
-    static get typeSearch() {return this._typeSearch.value}
+    static get endDate_() { return this._endDate }
+    static get endDate() { return this._endDate.value }
+
+    static get nomeCert_() { return this._nomeCert }
+    static get nomeCert() { return this._nomeCert.value }
+
+    static get codiCert_() { return this._codiCert }
+    static get codiCert() { return this._codiCert.value }
+
+    static get certs_() { return this._certs }
+    static get certs() { return this._certs.value }
+
+    static get typeSearch() { return this._typeSearch.value }
     static get typeSearchNome() {
         let nome = '';
         switch (this.typeSearch) {
@@ -56,27 +56,27 @@ class Main extends Janela {
         return nome;
     }
 
-    static get notifications_() {return this._notifications}
-    static get notifications() {return this._notifications.value}
+    static get notifications_() { return this._notifications }
+    static get notifications() { return this._notifications.value }
     //#getters
 
     //setters
-    static set opcaoVisivel(arg) {this._opcaoVisivel.value = arg}
-    static set loadingCert(arg) {this._loadingCert.value = arg}
-    static set startDate(arg) {this._startDate.value = arg}
-    static set endDate(arg) {this._endDate.value = arg}
-    static set typeSearch(arg) {this._typeSearch.value = arg}
-    static set nomeCert(arg) {this._nomeCert.value = arg}
-    static set codiCert(arg) {this._codiCert.value = arg}
-    static set certs(arg) {this._certs.value = arg}
-    static set notifications(arg) {this._notifications.value = arg}
+    static set opcaoVisivel(arg) { this._opcaoVisivel.value = arg }
+    static set loadingCert(arg) { this._loadingCert.value = arg }
+    static set startDate(arg) { this._startDate.value = arg }
+    static set endDate(arg) { this._endDate.value = arg }
+    static set typeSearch(arg) { this._typeSearch.value = arg }
+    static set nomeCert(arg) { this._nomeCert.value = arg }
+    static set codiCert(arg) { this._codiCert.value = arg }
+    static set certs(arg) { this._certs.value = arg }
+    static set notifications(arg) { this._notifications.value = arg }
     //#setters
 
-    static entrando() {
+    static before_enter() {
         console.log('Janela principal foi aberta.');
     }
-  
-    static saindo() {
+
+    static after_leave() {
         console.log('Janela principal foi fechada.');
     }
 
@@ -88,42 +88,42 @@ class Main extends Janela {
         if (this.typeSearch + 1 > 2) this.typeSearch = 0;
         else this.typeSearch++;
     }
-    
+
 
     static async getCertificadosCodigos(codigos) {
         if (!Array.isArray(codigos)) {
             addToast("getCertificadosCodigos", "o parametro: " + codigos + " não é um array!", "error");
             return null;
         }
-        if (codigos.length < 1){
+        if (codigos.length < 1) {
             addToast("Certificados por Codigo", "vazio", "error");
             return null;
-        } 
+        }
 
-        const data = await fetchJson('/mainpage/getCertificado.php', [{"h":"cert_codis", "b":codigos}]);
-    
-        if (data['certificados']){
+        const data = await fetchJson('/mainpage/getCertificado.php', [{ "h": "cert_codis", "b": codigos }]);
+
+        if (data['certificados']) {
             return data['certificados'];
         }
         else tratarRetornosApi(data, "Pesquisar por codigo");
-    
+
         return null;
     }
 
     static async prepareAndGetCertCodigos() {
-        const vetorCods =  this.codiCert.split(";").map(num => parseFloat(num)).filter(num => !isNaN(num));
+        const vetorCods = this.codiCert.split(";").map(num => parseFloat(num)).filter(num => !isNaN(num));
 
         return this.getCertificadosCodigos(vetorCods);
     }
 
     static async getCertificadosNome() {
-        const data = await fetchJson('/mainpage/getCertificado.php', [{"h":"nome_cert", "b":this.nomeCert}]);
-    
-        if (data['certificados']){
+        const data = await fetchJson('/mainpage/getCertificado.php', [{ "h": "nome_cert", "b": this.nomeCert }]);
+
+        if (data['certificados']) {
             return data['certificados'];
         }
         else tratarRetornosApi(data, "Pesquisar por nome");
-        
+
         return null;
     }
 
@@ -137,23 +137,23 @@ class Main extends Janela {
             addToast("Pesquisar Por Data", "Por favor, defina ambas as datas.", "warn");
             return null;
         }
-    
-        const data = await fetchJson('/mainpage/getCertificado.php', [{"h":"intervData", "b":[this.startDate, this.endDate]}]);
-    
-        if (data['certificados']){
+
+        const data = await fetchJson('/mainpage/getCertificado.php', [{ "h": "intervData", "b": [this.startDate, this.endDate] }]);
+
+        if (data['certificados']) {
             return data['certificados'];
         }
         else tratarRetornosApi(data, "Pesquisar por data");
-        
+
         return null;
     }
 
-    static async setCertificados() {        
-        this.loadingCert = true;      
+    static async setCertificados() {
+        this.loadingCert = true;
 
         try {
             this.certs = [];
-            
+
             let certs = null;
             switch (this.typeSearch) {
                 case 0: certs = await this.getCertificadosNome(); break;
@@ -163,25 +163,25 @@ class Main extends Janela {
 
             if (certs) {
                 this.certs = certs;
-                Main.addNotification("Pesquisa por "+this.typeSearchNome+". "+this.certs.length+" resultados.");
+                Main.addNotification("Pesquisa por " + this.typeSearchNome + ". " + this.certs.length + " resultados.");
             }
 
         } catch (error) {
-            addToast("MainPage/setCertificados","erro no getCertificado", "error");
+            addToast("MainPage/setCertificados", "erro no getCertificado", "error");
         }
-        
+
         this.loadingCert = false;
     }
 
-    
+
     static findCertIndex(codi) {
         if (Array.isArray(this.certs)) return this.certs.findIndex(c => c.id === codi);
         return -1;
     }
 
-    static async atualizaCerts(certs_cods) {        
+    static async atualizaCerts(certs_cods) {
         if (this.certs.length < 1 || certs_cods.length < 1) return;
-        
+
         try {
             const certs = await this.getCertificadosCodigos(certs_cods);
 
@@ -189,13 +189,13 @@ class Main extends Janela {
                 certs.forEach(crt => {
                     const found = this.findCertIndex(crt.id); // Procura pelo certificado
 
-                    if (found > -1){
+                    if (found > -1) {
                         this.certs[found] = crt;
                     }
-                });                            
-            }           
+                });
+            }
         } catch (error) {
-            addToast("MainPage/atualizaCerts","erro no atualizaCerts", "error");
+            addToast("MainPage/atualizaCerts", "erro no atualizaCerts", "error");
         }
 
         if (MainModal.isModalVisible) {  //Se tiver algum certificado aberto, recarrega-lo
@@ -205,43 +205,43 @@ class Main extends Janela {
 
 
     //Ordenar os certificados;
-    static certAcendingOrder = {'id':true, 'usos':true, 'nome':true, 'venc':true, 'notf':true, 'agnd':true, 'prbl':true};
-    static sortCertBy(col){
+    static certAcendingOrder = { 'id': true, 'usos': true, 'nome': true, 'venc': true, 'notf': true, 'agnd': true, 'prbl': true };
+    static sortCertBy(col) {
         this.loadingCert = true;
         let asc = (this.certAcendingOrder.col = !this.certAcendingOrder.col);
 
-        switch (col){
-            case 'id':{
+        switch (col) {
+            case 'id': {
                 if (asc) this.certs.sort((a, b) => a.id - b.id);
                 else this.certs.sort((b, a) => a.id - b.id);
                 break
             }
-            case 'usos':{
+            case 'usos': {
                 if (asc) this.certs.sort((a, b) => a.usos - b.usos);
                 else this.certs.sort((b, a) => a.usos - b.usos);
                 break
             }
-            case 'nome':{
+            case 'nome': {
                 if (asc) this.certs.sort((a, b) => a.nome.localeCompare(b.nome));
                 else this.certs.sort((b, a) => a.nome.localeCompare(b.nome));
                 break
             }
-            case 'venc':{
+            case 'venc': {
                 if (asc) this.certs.sort((a, b) => a.venc.localeCompare(b.venc));
                 else this.certs.sort((b, a) => a.venc.localeCompare(b.venc));
                 break
             }
-            case 'notf':{
+            case 'notf': {
                 if (asc) this.certs.sort((a, b) => a.notf - b.notf);
                 else this.certs.sort((b, a) => a.notf - b.notf);
                 break
             }
-            case 'agnd':{
+            case 'agnd': {
                 if (asc) this.certs.sort((a, b) => a.agnd - b.agnd);
                 else this.certs.sort((b, a) => a.agnd - b.agnd);
                 break
             }
-            case 'prbl':{
+            case 'prbl': {
                 if (asc) this.certs.sort((a, b) => a.prbl - b.prbl);
                 else this.certs.sort((b, a) => a.prbl - b.prbl);
                 break
@@ -253,8 +253,8 @@ class Main extends Janela {
 
 
 
-    static addNotification(texto) {   
-        if (this.notifications.unshift(texto) > 20) this.notifications.splice(20);        
+    static addNotification(texto) {
+        if (this.notifications.unshift(texto) > 20) this.notifications.splice(20);
     }
 
 }

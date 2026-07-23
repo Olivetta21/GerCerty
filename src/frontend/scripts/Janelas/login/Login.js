@@ -1,6 +1,7 @@
 import { ref } from 'vue';
 import Janela from '../Janela';
 import pgUpdates from '../../pagesUpdates';
+import Cookies from 'js-cookie';
 
 import { addToast } from '../../toastNotification';
 import { sleep } from '../../utils';
@@ -10,37 +11,30 @@ import router from '@/router';
 
 class Login extends Janela {
     static nome = 'Login';
-    static entrando() {
+    static login = "";
+
+    static async before_enter() {
+        await this.fazerLogoff();
         document.title = "Certificados";
         this.USERLOGGED = false;
-        this.login = '';
-        this.password = '';
         this.token = '';
         this.user_permissions = [];
         //router.replace({ name: 'login' });
         pgUpdates.stop();
         console.log('Janela login foi aberta.');
     }
-  
-    static saindo() {
+
+    static after_leave() {
         this.password = '';
         console.log('Janela login foi fechada.');
     }
 
-    static _login = ref('');
-    static _password = ref('');
     static _aliqVend = 0.0;
     static _loadingVerificando = ref(false);
     static _sessaoExpirada = ref(false);
 
-    static holdUserCred = {
-        login: "",
-        senha: ""
-    }
-
     static _USERLOGGED = ref(false);
-    static _USERNAME = '1';
-    static USERLOGIN = '2';
+    static _USERNAME = '';
 
     static user_permissions = [];
     static verifPerm(perm, msg) {
@@ -51,75 +45,88 @@ class Login extends Janela {
         return p;
     }
 
-    static get login_() {return this._login}
-    static get login() {return this._login.value}
-    static get password_() {return this._password}
-    static get password() {return this._password.value}
-    static get loadingVerificando_() {return this._loadingVerificando}
-    static get loadingVerificando() {return this._loadingVerificando.value}
-    static get USERLOGGED_() {return this._USERLOGGED}
-    static get USERLOGGED() {return this._USERLOGGED.value}
-    static get aliqVend() {return this._aliqVend}
-    static get USERNAME() {return this._USERNAME}
-    static get sessaoExpirada_() {return this._sessaoExpirada}
-    static get sessaoExpirada() {return this._sessaoExpirada.value}
+    static get loadingVerificando_() { return this._loadingVerificando }
+    static get loadingVerificando() { return this._loadingVerificando.value }
+    static get USERLOGGED_() { return this._USERLOGGED }
+    static get USERLOGGED() { return this._USERLOGGED.value }
+    static get aliqVend() { return this._aliqVend }
+    static get USERNAME() { return this._USERNAME }
+    static get sessaoExpirada_() { return this._sessaoExpirada }
+    static get sessaoExpirada() { return this._sessaoExpirada.value }
 
-    static set login(arg) {this._login.value = arg}
-    static set password(arg) {this._password.value = arg}
-    static set loadingVerificando(arg) {this._loadingVerificando.value = arg}
-    static set USERNAME(arg) {this._USERNAME = arg}
-    static set aliqVend(arg) {this._aliqVend = arg}
-    static set USERLOGGED(arg) {this._USERLOGGED.value = arg}
-    static set sessaoExpirada(arg) {this._sessaoExpirada.value = arg}
+    static set loadingVerificando(arg) { this._loadingVerificando.value = arg }
+    static set USERNAME(arg) { this._USERNAME = arg }
+    static set aliqVend(arg) { this._aliqVend = arg }
+    static set USERLOGGED(arg) { this._USERLOGGED.value = arg }
+    static set sessaoExpirada(arg) { this._sessaoExpirada.value = arg }
 
     static token = '';
 
 
 
-    static async reEnter(){
-        const currentRoute = router.currentRoute.value;
-        router.replace({ name: 'login' });
-        this.login = this.holdUserCred.login;
-        this.password = this.holdUserCred.senha;
-        await this.verifLogin();
-        router.push(currentRoute);
+    static async fazerLogoff() {
+        let resp = null;
+        if (Cookies.get('access_token')) {
+            resp = await fetchJson("/loginpage/login.php", [{ "h": "logoff", "b": 1 }]);
+        }
+
+        return resp;
     }
 
-    static async verifLogin() {
-        if (!this.login || !this.password){
-            addToast("LoginPage/verifLogin","Login inválido", "error");
-            return;
+    static setLogged(data, to = "inicio") {
+        if (data['success']) {
+            const usuario = data['usuario'];
+
+            this.user_permissions = usuario['permissoes'] ?? [];
+
+            this.USERLOGGED = true;
+            this.USERNAME = usuario['nome'].toUpperCase();
+            this.login = usuario['login'];
+            this.aliqVend = usuario['vend_comiss'] ?? 0.0;
+            this.token = usuario['access_token'];
+
+            pgUpdates.start(usuario['last_update'] ?? 0);
+
+            router.push({ name: to });
+
+            addToast('Bom dia', this.USERNAME + '!\nUltimo Login: ' + usuario['last_login'], 'success');
+            return true;
         }
-        
+        else tratarRetornosApi(data, "login");
+        return false;
+    }
+
+    static async isAuthenticated(to) {
+        if (this.USERLOGGED) {
+            return true;
+        } else {
+            const access_token = Cookies.get('access_token');
+            if (!access_token) return false;
+            console.log("access_token do cookie:", access_token);
+
+
+            const resp = await fetchJson("/loginpage/login.php", [{ "h": "access_token", "b": access_token }]);
+            return this.setLogged(resp, to);
+        }
+    }
+
+    static async fazerLogin(login, senha) {
         this.loadingVerificando = true;
         let lastPrssdLoginTime = Date.now();
 
-        const data = await fetchJson("/loginpage/verifLogin.php", [{"h":"usercred","b":[this.login, this.password]}]);
+        const resp = await fetchJson("/loginpage/login.php", [{ "h": "usercred", "b": [login, senha] }]);
 
-        if (data['credent']){
-            const credent = data['credent'];
+        this.setLogged(resp);
 
-            this.user_permissions = (data['user_permissions']) ? data['user_permissions'] : [];
-
-            this.USERLOGGED = true;
-            this.USERNAME = credent['nome'].toUpperCase();                
-            this.USERLOGIN = credent['login'];
-            this.aliqVend = credent['vend_comiss'];
-            this.token = data['TK'];
-            
-            data['LKU'] ? pgUpdates.start(data['LKU']) : pgUpdates.start(0);
-
-            this.holdUserCred.login = this.login;
-            this.holdUserCred.senha = this.password;
-            router.push({ name: 'inicio' });						
-
-            addToast('Bom dia', this.USERNAME + '!\nUltimo Login: ' + data['last_login'], 'success');
-        }
-        else tratarRetornosApi(data, "login");
-        
         const diferenca = 1000 - (Date.now() - lastPrssdLoginTime);
         if (diferenca > 0) await sleep(diferenca);
         this.loadingVerificando = false;
+    }
+
+    static reEnter() {
+        //const currentRoute = router.currentRoute.value;
+        router.replace({ name: 'login' });
+        //router.push(currentRoute);
     }
 }
 

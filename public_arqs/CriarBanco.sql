@@ -3,21 +3,22 @@ CREATE TABLE usuario (
     nome VARCHAR(80) NOT NULL,
     senha VARCHAR(16) NOT NULL,
 	bene_comiss NUMERIC(10,2) not null DEFAULT 0,
-	vend_comiss NUMERIC(10,2) not null DEFAULT 0,
-	token text
+	vend_comiss NUMERIC(10,2) not null DEFAULT 0
 );
 
 
 CREATE TABLE logins_usuario (
 	id SERIAL PRIMARY key,
 	usuario_login VARCHAR(32) not null REFERENCES usuario(login),
-	ip VARCHAR(16) not null DEFAULT ' ',
+	ip VARCHAR(128) not null,
+    tipo VARCHAR(32) not null,
 	data TIMESTAMP not null DEFAULT now()
 );
 
 CREATE TABLE certificado (
     codi INTEGER PRIMARY KEY,
     nome VARCHAR(80) NOT NULL,
+	telefone_whatsapp varchar(24) default null,
     vencimento DATE NOT NULL,
     local VARCHAR(16),
     
@@ -42,8 +43,8 @@ CREATE TABLE cronograma (
 CREATE TABLE atualizacoes (
     id SERIAL PRIMARY KEY,
     usuario varchar(32) not null REFERENCES usuario(login),
-    header VARCHAR(4) NOT NULL,
-    body VARCHAR(16) NOT NULL
+    header VARCHAR(256) NOT NULL,
+    body VARCHAR(256) NOT NULL
 );
 
 
@@ -113,31 +114,31 @@ create table permissoes (
 
 
 
--- VIEWS
-CREATE VIEW vw_certificado_cronograma as (    
-    select c.codi as id, c.versao, 'escondido' as local, c.empresa, c.respRFB as respRFB_id, v.revl as usos, upper(c.nome) as nome, c.vencimento as venc, i.notf, i.agnd, i.prbl from certificado c
-    left join (
-        SELECT 
-            cert_codi, cert_versao,
-            bool_or(type = 'AGND') AS agnd,
-            bool_or(type = 'NOTF') AS notf,
-            count (*) FILTER (where type = 'PRBL') AS prbl
-        FROM 
-            cronograma
-        group by cert_codi, cert_versao
-    ) as i on i.cert_codi = c.codi and i.cert_versao = c.versao
-    left join (
-        SELECT 
-            cert_codi, count(*) as revl
-        FROM 
-            cronograma
-        WHERE type = 'REVL'
-        group by cert_codi
-    ) as v on v.cert_codi = c.codi
-);
+    -- VIEWS
+    CREATE OR REPLACE VIEW vw_certificado_cronograma as (    
+        select c.codi as id, c.versao, 'escondido' as local, c.empresa, c.respRFB as respRFB_id, v.revl as usos, upper(c.nome) as nome, c.vencimento as venc, i.notf, i.agnd, i.prbl, c.telefone_whatsapp from certificado c
+        left join (
+            SELECT 
+                cert_codi, cert_versao,
+                bool_or(type = 'AGND') AS agnd,
+                bool_or(type = 'NOTF') AS notf,
+                count (*) FILTER (where type = 'PRBL') AS prbl
+            FROM 
+                cronograma
+            group by cert_codi, cert_versao
+        ) as i on i.cert_codi = c.codi and i.cert_versao = c.versao
+        left join (
+            SELECT 
+                cert_codi, count(*) as revl
+            FROM 
+                cronograma
+            WHERE type = 'REVL'
+            group by cert_codi
+        ) as v on v.cert_codi = c.codi
+    );
 
 
-CREATE VIEW vw_certificado_completo as (
+CREATE OR REPLACE VIEW vw_certificado_completo as (
     select c_cron.*, rfb.nome as resprfb from vw_certificado_cronograma c_cron
     left join (
         select codi, nome from certificado
@@ -155,8 +156,8 @@ CREATE VIEW vw_cronograma_completo as (
 -- FUNCTIONS
 
 -- Verifica se o usuario existe, se sim, atualiza o token e insere o novo login no logins_usuario, retornando os dados do usuario o ultimo login e a ultima atualizacao do banco.
-CREATE OR REPLACE FUNCTION fn_do_user_login(p_login varchar(32), p_senha varchar(16), ip varchar(16), new_token text)
-RETURNS TABLE (login varchar(32), nome varchar(80), senha varchar(16), vend_comiss NUMERIC(10,2), last_login timestamp, token text, last_update integer) AS $$
+CREATE OR REPLACE FUNCTION fn_do_user_login(p_login varchar(32), p_senha varchar(16), ip varchar(16), var_tipo varchar(32))
+RETURNS TABLE (login varchar(32), nome varchar(80), senha varchar(16), vend_comiss NUMERIC(10,2), last_login timestamp, last_update integer) AS $$
 DECLARE
     user_nome varchar(80);
     user_senha varchar(16);
@@ -178,21 +179,16 @@ BEGIN
     ORDER BY data DESC
     LIMIT 1;
 
-    -- Atualiza o token
-    UPDATE usuario
-    SET token = new_token
-    WHERE usuario.login = p_login;
-
     -- Insere o novo login no logins_usuario
-    INSERT INTO logins_usuario (usuario_login, ip)
-    VALUES (p_login, ip);
+    INSERT INTO logins_usuario (usuario_login, ip, tipo)
+    VALUES (p_login, ip, var_tipo);
 
     -- Pega a ultima atualizacao do banco
     SELECT MAX(id) INTO last_update
     FROM atualizacoes;
 
     -- Retorna os dados do usuario e o ultimo login
-    RETURN QUERY SELECT p_login, user_nome, user_senha, user_vend_comiss, last_login, new_token, last_update;
+    RETURN QUERY SELECT p_login, user_nome, user_senha, user_vend_comiss, last_login, last_update;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -305,11 +301,45 @@ $$ LANGUAGE plpgsql;
 
 
 
+create table telefones_clientes (
+    id SERIAL primary key,
+    cliente text check (cliente = upper(cliente)),
+    numero text,
+    original text,
+    prioridade integer not null,
+    data timestamp not null default now(),
+    quem_inseriu varchar(32) not null references usuario(login)
+);
+
+create table usuario_access_token(
+    token varchar(256) not null primary key,
+    usuario_login varchar(32) not null references usuario(login),
+    created_at timestamp with time zone default now(),
+    expires_at timestamp with time zone not null
+);
+
+--Pegar o usuario por um token de acesso valido
+create function getUsuarioByToken(
+    var_token varchar
+) returns table (
+    login varchar, nome varchar
+) as $$
+    select u.login, u.nome
+    from usuario u
+    where u.login = (
+        select usuario_login from usuario_access_token where token = var_token and expires_at > now() limit 1
+    )
+$$ language sql;
 
 
-
-
-
+create table auditoria (
+    id serial primary key,
+    usuario_login varchar(32) not null references usuario(login),
+    acao varchar(64) not null,
+    info text not null,
+    ip varchar(128) not null,
+    data timestamp not null default now()
+);
 
 
 
@@ -317,8 +347,6 @@ $$ LANGUAGE plpgsql;
 
 
 --ADD
-
-
 insert into usuario (login, nome, senha) values ('admin', 'administrador', '11111111');
 
 insert into grupo_usuario_info (nome) values ('admins');

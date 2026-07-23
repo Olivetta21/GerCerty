@@ -1,7 +1,7 @@
-:root{
-	--padrShadowHover: inset -8px -8px 4px 0px #ff00001c;
-	--bordCinza: rgb(223, 223, 223);
-	--fundoAzul: #00bbff79;
+:root {
+    --padrShadowHover: inset -8px -8px 4px 0px #ff00001c;
+    --bordCinza: rgb(223, 223, 223);
+    --fundoAzul: #00bbff79;
     --sombraSuave: 3px 3px 6px rgba(0, 0, 0, 0.5);
 
     --cor-borda-escuro: brown;
@@ -12,6 +12,7 @@
     --fundo-secundario: rgb(200, 240, 255);
     --cor-letra-escuro: brown;
     --cor-letra-claro: wheat;
+    --cor-letra-escuro2: rgb(102, 32, 0);
 
     --padding-normal: 10px;
 }

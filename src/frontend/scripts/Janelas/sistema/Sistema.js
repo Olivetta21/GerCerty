@@ -11,37 +11,34 @@ class Sistema extends Janela {
     static pesqUser = '';
 
     static _configurando = ref('');
-    static get configurando_(){return this._configurando}
-    static get configurando(){return this._configurando.value}
-    static set configurando(arg){this.configurando_.value = arg}
+    static get configurando_() { return this._configurando }
+    static get configurando() { return this._configurando.value }
+    static set configurando(arg) { this.configurando_.value = arg }
 
     static _usuariosSistemas = ref([]);
-    static get usuariosSistemas_(){return this._usuariosSistemas}
-    static get usuariosSistemas(){return this._usuariosSistemas.value}
-    static set usuariosSistemas(arg){this.usuariosSistemas_.value = arg}
+    static get usuariosSistemas_() { return this._usuariosSistemas }
+    static get usuariosSistemas() { return this._usuariosSistemas.value }
+    static set usuariosSistemas(arg) { this.usuariosSistemas_.value = arg }
 
     static _gruposPerms = ref([]);
-    static get gruposPerms_(){return this._gruposPerms}
-    static get gruposPerms(){return this._gruposPerms.value}
-    static set gruposPerms(arg){this.gruposPerms_.value = arg}
-	
-	static _permsIndiv = ref([]);
-    static get permsIndiv_(){return this._permsIndiv}
-    static get permsIndiv(){return this._permsIndiv.value}
-    static set permsIndiv(arg){this.permsIndiv_.value = arg}
+    static get gruposPerms_() { return this._gruposPerms }
+    static get gruposPerms() { return this._gruposPerms.value }
+    static set gruposPerms(arg) { this.gruposPerms_.value = arg }
 
-    static entrando() {
+    static _permsIndiv = ref([]);
+    static get permsIndiv_() { return this._permsIndiv }
+    static get permsIndiv() { return this._permsIndiv.value }
+    static set permsIndiv(arg) { this.permsIndiv_.value = arg }
+
+    static before_enter() {
         this.getPermissoes();
     }
 
-    static saindo (){
 
-    }
-
-    static async getPermissoes(){
+    static async getPermissoes() {
         const data = await fetchJson("/sistemapage/getPermissions.php", null);
 
-        if (data['grupos'] && data['perms']){
+        if (data['grupos'] && data['perms']) {
             this.gruposPerms = data['grupos'];
             this.permsIndiv = data['perms'];
         }
@@ -53,16 +50,16 @@ class Sistema extends Janela {
 
 
     //for groups-------------------------------------------------------------------------------------------------------------------
-    static loadGruposNoUsuario(u_idx){
-        if (this.usuariosSistemas[u_idx].gp_perm == null){
+    static loadGruposNoUsuario(u_idx) {
+        if (this.usuariosSistemas[u_idx].gp_perm == null) {
             this.usuariosSistemas[u_idx].gp_perm = [];
         }
 
-        if (Array.isArray(this.usuariosSistemas[u_idx].gp_perm)){
+        if (Array.isArray(this.usuariosSistemas[u_idx].gp_perm)) {
             let newGps = structuredClone(this.gruposPerms); //copiar todos os grupos existentes para dentro do usuario.
 
             this.usuariosSistemas[u_idx].gp_perm.forEach(user_gp => {
-                for (const grupo of newGps){
+                for (const grupo of newGps) {
                     if (user_gp.db && user_gp.id === grupo.id) {
                         grupo.db = true; //pra saber qual grupo veio do banco.
                         grupo.integrante = true; //se no vetor de grupos do usuario ja tiver algum id, marcar ele como "integrante".
@@ -76,7 +73,7 @@ class Sistema extends Janela {
         }
         else addToast("loadGruposNoUsuario", "nao é array", "error", true);
     }
-    static grupoIntegranteSwap(uidx, gidx){
+    static grupoIntegranteSwap(uidx, gidx) {
         let grupo = this.usuariosSistemas[uidx].gp_perm[gidx];
         if (!grupo) {
             addToast("alterar grupo", "indice nao encontrado", "error", true);
@@ -89,7 +86,7 @@ class Sistema extends Janela {
         else { //se nao, ele quer adiciona-lo
             grupo.integrante = true;
         }
-    }    
+    }
     static mostrarGruposDoUsuario(u_idx) {
         //Gambiarra, o nome so aparece no vetor de grupos quando o calculo foi feito. então se nao tiver o nome, fazer o calculo antes.
         if (!this.usuariosSistemas[u_idx].gp_perm || !this.usuariosSistemas[u_idx].gp_verificado) this.loadGruposNoUsuario(u_idx);
@@ -110,12 +107,12 @@ class Sistema extends Janela {
 
 
     //for perms----------------------------------------------------------------------------------------------------------------------
-    static loadPermIndivNoUsuario(u_idx){
-        if (this.usuariosSistemas[u_idx].pi_perm == null){
+    static loadPermIndivNoUsuario(u_idx) {
+        if (this.usuariosSistemas[u_idx].pi_perm == null) {
             this.usuariosSistemas[u_idx].pi_perm = [];
-        }        
+        }
 
-        if (Array.isArray(this.usuariosSistemas[u_idx].pi_perm)){
+        if (Array.isArray(this.usuariosSistemas[u_idx].pi_perm)) {
             let newPis = structuredClone(this.permsIndiv); //copiar todos os grupos existentes para dentro do usuario.
 
             this.usuariosSistemas[u_idx].pi_perm.forEach(user_pi => {
@@ -132,8 +129,8 @@ class Sistema extends Janela {
             this.usuariosSistemas[u_idx].pi_verificado = true;
         }
         else addToast("loadPermIndivNoUsuario", "nao é array", "error", true);
-    }    
-    static permIndivSwap(uidx, pidx){
+    }
+    static permIndivSwap(uidx, pidx) {
         let perm = this.usuariosSistemas[uidx].pi_perm[pidx];
         if (!perm) {
             addToast("alterar permissao", "indice nao encontrado", "error", true);
@@ -146,7 +143,7 @@ class Sistema extends Janela {
         else { //se nao, ele quer adiciona-lo
             perm.integrante = true;
         }
-    } 
+    }
     static mostrarPermIndivDoUsuario(u_idx) {
         if (!this.usuariosSistemas[u_idx].pi_perm || !this.usuariosSistemas[u_idx].pi_verificado) this.loadPermIndivNoUsuario(u_idx);
         this.usuariosSistemas[u_idx].verPermType = 'P';
@@ -156,15 +153,15 @@ class Sistema extends Janela {
 
 
     static async getUsuarios() {
-        const data = await fetchJson("/sistemapage/getUsuarios.php", [{"h":"nomesearch","b":this.pesqUser}]);
+        const data = await fetchJson("/sistemapage/getUsuarios.php", [{ "h": "nomesearch", "b": this.pesqUser }]);
 
-        if (data['usuarios']){
+        if (data['usuarios']) {
             this.usuariosSistemas = data['usuarios'];
         }
         else tratarRetornosApi(data, "getUserSistemas");
     }
 
-    static async salvarAlteracao(uidx){
+    static async salvarAlteracao(uidx) {
         addToast("salvar", "salvando...", "info");
 
         const u = this.usuariosSistemas[uidx];
@@ -174,11 +171,11 @@ class Sistema extends Janela {
             nome: u.nome,
             senha: u.senha,
             bene_comiss: u.bene_comiss,
-            vend_comiss: u.vend_comiss          
+            vend_comiss: u.vend_comiss
         }
 
         if (Login.verifPerm(11)) {
-            if (u.pi_perm && u.pi_verificado){
+            if (u.pi_perm && u.pi_verificado) {
                 newU.pi_perm = [];
 
                 u.pi_perm.forEach(pi => {
@@ -193,12 +190,12 @@ class Sistema extends Janela {
                 });
             }
         }
-        
+
         console.log(newU);
 
-        const data = await fetchJson("/sistemapage/salvarAlteracao.php", [{"h":"usuario","b":newU}]);
+        const data = await fetchJson("/sistemapage/salvarAlteracao.php", [{ "h": "usuario", "b": newU }]);
 
-        if (data['success']){
+        if (data['success']) {
             addToast("Informação de usuario", "salvo com sucesso!", "success");
         }
         else tratarRetornosApi(data, "salvarAlteracao");

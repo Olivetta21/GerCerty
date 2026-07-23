@@ -3,7 +3,9 @@
 		<transition name="page" mode="out-in">
             <ModalCertificado v-if="MainModal.isModalVisible" />
 		</transition>
-	
+		<transition name="page" mode="out-in">
+            <ModalEnviarWhatsapp v-if="EnviarWhatsModal.isModalVisible" />
+		</transition>
         <form @submit.prevent id="pesquisacert" class="soft-panel">
             <button type="button" @click="Main.swTypeSearch()">
                 {{ Main.typeSearchNome }}
@@ -58,7 +60,7 @@
                             <td> {{ crt.usos ? crt.usos : 0 }} </td>
                             <td class="col-fit-content"> {{ crt.nome }} </td>
                             <td> {{ crt.venc }}  ⏳ {{ daysToExpire(crt.venc) }} </td>
-                            <td> {{ crt.notf > 0 || crt.agnd > 0 ? "🔔" : " " }} </td>
+                            <td> {{ crt.notf > 0 || crt.agnd > 0 ? "🔔" : " " }} <button v-if="daysToExpire(crt.venc) < 40" @click="EnviarWhatsModal.open(crt)">📞</button></td>
                             <td> {{ crt.agnd > 0 ? "✔️" : " " }} </td>
                             <td> {{ crt.prbl > 0 ? "⚠️" : " " }} </td>
                         </tr>
@@ -82,6 +84,8 @@ import ModalCertificado from './TelaPrincipal/ModalCertificado.vue';
 import router from '../router';
 
 import { prepareObjArrToCSV, generateCSV } from '../frontend/scripts/utils';
+import ModalEnviarWhatsapp from './TelaPrincipal/ModalEnviarWhatsapp.vue';
+import EnviarWhatsModal from '@/frontend/scripts/Janelas/main/EnviarWhatsModal';
 
 export default {
 	data() {
@@ -91,6 +95,7 @@ export default {
 
             Main,
                 MainModal,
+                EnviarWhatsModal,
 
 
 		};
@@ -132,7 +137,8 @@ export default {
         },
     },
     components: {
-        ModalCertificado
+        ModalCertificado,
+        ModalEnviarWhatsapp
     },
 };
 </script>

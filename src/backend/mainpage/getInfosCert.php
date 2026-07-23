@@ -8,6 +8,9 @@ $pdo = $credentials['pdo'];
 if (isset($_POST['cert_codis'])){
     $cert_codis = json_decode($_POST['cert_codis'], true);
 
+    $info = implode(",", $cert_codis);
+    auditar($credentials, "Infos dos Certificados", $info);
+
     $codis_placeholder = implode(',',array_fill(0, count($cert_codis), '?'));
 
     $sql = "

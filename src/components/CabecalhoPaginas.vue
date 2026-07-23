@@ -1,16 +1,19 @@
 <template> 
     <div id="cabecalhoo">
         <div id="cabecalho-hori"> 
+            <button v-if="!menuVisible" @click="menuVisible = !menuVisible"> Menu </button>
             <div> {{ Login.USERNAME }}</div>
             <button @click="router.push({ name: 'login' })"> Sair </button>
         </div>
         <div id="conteudo">
-            <div id="cabecalho-vert"> 
+            <div id="cabecalho-vert" v-if="menuVisible"> 
+                <p @click="menuVisible = !menuVisible"> <span class="close"> &times; </span> </p>
                 <button @click="router.push({ name: 'inicio' })" > Inicio </button>
                 <button v-if="Login.verifPerm(3)" @click="router.push({ name: 'pagamentos' })" > Pagamentos </button>
                 <button v-if="Login.verifPerm(4) || Login.verifPerm(5)" @click="router.push({ name: 'relatorios' })" > Relatórios </button>
                 <button v-if="Login.verifPerm(1)" @click="router.push({ name: 'vendas' })" > Vendas </button>
                 <button v-if="Login.verifPerm(12)" @click="router.push({ name: 'sistema' })" > Sistema </button>
+                <button @click="router.push({ name: 'contatos' })" > Contatos </button>
                 
                 <div id="hnotifcont" class="whitesoftshadow scroll-brown">
                     <p v-for="(notif, index) in Main.notifications" :key="index" class="hnotif"> {{ notif }} </p>
@@ -33,7 +36,8 @@ export default {
     return {
         router,
         Login,
-        Main
+        Main,
+        menuVisible: true
     };
   }
 };
@@ -87,6 +91,7 @@ export default {
     #pagina {
         flex: 1;
         width: calc(100% - 200px);
+        overflow-x: auto;
     }
 
 </style>

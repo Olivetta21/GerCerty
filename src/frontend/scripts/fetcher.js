@@ -1,7 +1,7 @@
 import Login from "./Janelas/login/Login";
 import { addToast } from "./toastNotification";
 
-export async function fetchJson(endereco, arrayValores){
+export async function fetchJson(endereco, arrayValores) {
     //[{"h": "head", "b": "body"}]
     if (arrayValores && !Array.isArray(arrayValores)) {
         addToast("fetchJson", "o parametro: " + arrayValores + " não é um array!", "error");
@@ -17,12 +17,8 @@ export async function fetchJson(endereco, arrayValores){
                 formData.append(e.h, JSON.stringify(e.b));
             });
         }
-        
-        let prod = false;
-        const dest_api = (prod) ? "https://api.olivetta.com.br/certificados/backend" : "http://gercert.serv";
-        //const dest_api = "http://192.168.0.100";
 
-        const response = await fetch(dest_api + endereco, {
+        const response = await fetch("/api" + endereco + '?l=' + Login.login, {
             method: 'POST',
             body: formData
         });
@@ -34,7 +30,7 @@ export async function fetchJson(endereco, arrayValores){
         catch (error) {
             console.error("fetchjson-json", response);
         }
-        
+
     } catch (error) {
         console.error("fetchjson", error);
     }
