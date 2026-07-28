@@ -4,10 +4,10 @@ include "../funcs.php";
 $credentials = validUserAndGetDB();
 $pdo = $credentials['pdo'];
 
-function insertNovoTelefone($credentials, $nome_cliente, $numero) {
+function insertNovoTelefone($credentials, $nome_cliente, $numero, $anotacao = '') {
     try {
         $pdo = $credentials['pdo'];
-        $sql = "INSERT INTO telefones_clientes (cliente, numero, original, prioridade, quem_inseriu) VALUES (upper(:cliente), :numero, :original, :prioridade, :quem_inseriu)";
+        $sql = "INSERT INTO telefones_clientes (cliente, numero, original, prioridade, quem_inseriu, anotacao) VALUES (upper(:cliente), :numero, :original, :prioridade, :quem_inseriu, :anotacao)";
         $stmt = $pdo->prepare($sql);
         //returnJson(["erro"=>"nsei"]);
         
@@ -17,6 +17,7 @@ function insertNovoTelefone($credentials, $nome_cliente, $numero) {
             ':original' => "contatos(".$credentials['usuario'].")",
             ':prioridade' => 1,
             ':quem_inseriu' => $credentials['usuario'],
+            ':anotacao' => $anotacao,
         ]);
         if ($stmt->rowCount() === 1) {
             return ["success" => "Número inserido com sucesso"];
@@ -28,12 +29,12 @@ function insertNovoTelefone($credentials, $nome_cliente, $numero) {
     }
 }
 
-function updateCertNumber($credentials, $cert_codigo, $numero){
+function updateCertNumber($credentials, $cert_codigo, $numero, $anotacao = '') {
     $pdo = $credentials['pdo'];
 
     try {
         $pdo->beginTransaction();
-        $sql = "INSERT INTO telefones_clientes (cliente, numero, original, prioridade, quem_inseriu) VALUES ((select nome from certificado where codi = :cert_codigo), :numero, :original, :prioridade, :quem_inseriu)";
+        $sql = "INSERT INTO telefones_clientes (cliente, numero, original, prioridade, quem_inseriu, anotacao) VALUES ((select nome from certificado where codi = :cert_codigo), :numero, :original, :prioridade, :quem_inseriu, :anotacao)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':cert_codigo' => $cert_codigo,
@@ -41,6 +42,7 @@ function updateCertNumber($credentials, $cert_codigo, $numero){
             ':original' => "certificados(".$credentials['usuario'].")",
             ':prioridade' => 1,
             ':quem_inseriu' => $credentials['usuario'],
+            ':anotacao' => $anotacao,
         ]);
         if ($stmt->rowCount() === 1) {
             $sql = "update certificado set telefone_whatsapp = :numero where codi = :cert_codigo";
@@ -68,7 +70,7 @@ function updateCertNumber($credentials, $cert_codigo, $numero){
     }
 }
 
-function updateTelefone($credentials, $id, $nome_cliente, $numero) {
+function updateTelefone($credentials, $id, $nome_cliente, $numero, $anotacao = '') {
     try {
         $pdo = $credentials['pdo'];
         $pdo->beginTransaction();
@@ -84,12 +86,13 @@ function updateTelefone($credentials, $id, $nome_cliente, $numero) {
             return ["error" => "Contato não encontrado"];
         }
 
-        $sql = "UPDATE telefones_clientes SET cliente = upper(:cliente), numero = :numero, quem_inseriu = :quem_inseriu WHERE id = :id";
+        $sql = "UPDATE telefones_clientes SET cliente = upper(:cliente), numero = :numero, quem_inseriu = :quem_inseriu, anotacao = :anotacao WHERE id = :id";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
             ':cliente' => $nome_cliente,
             ':numero' => $numero,
             ':quem_inseriu' => $credentials['usuario'],
+            ':anotacao' => $anotacao,
             ':id' => $id,
         ]);
         if ($stmt->rowCount() === 1) {
@@ -163,7 +166,7 @@ if (isset($_POST['set_numero'])){
     verifPerm(16, $user_permissions);
 
     $dados = json_decode($_POST['add_contato'], true);
-    $resultado = insertNovoTelefone($credentials, removerAcentos($dados['nome_cliente']), $dados['numero']);
+    $resultado = insertNovoTelefone($credentials, removerAcentos($dados['nome_cliente']), $dados['numero'], $dados['anotacao'] ?? '');
     if (isset($resultado["success"])) {
         addAtualizacao("CTTA", explode(' ', trim($dados['nome_cliente']))[0] ?? '', $credentials);
         echo correctJson2(["success" => $resultado, "id" => $pdo->lastInsertId()]);
@@ -176,7 +179,7 @@ if (isset($_POST['set_numero'])){
     verifPerm(15, $user_permissions);
 
     $dados = json_decode($_POST['edit_contato'], true);
-    $resultado = updateTelefone($credentials, $dados['id'], removerAcentos($dados['nome_cliente']), $dados['numero']);
+    $resultado = updateTelefone($credentials, $dados['id'], removerAcentos($dados['nome_cliente']), $dados['numero'], $dados['anotacao'] ?? '');
     if (isset($resultado["success"])) {
         addAtualizacao("CTTE", explode(' ', trim($dados['nome_cliente']))[0] ?? '', $credentials);
         echo correctJson2(["success" => $resultado]);

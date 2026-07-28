@@ -1,5 +1,5 @@
 <template>
-    <div id="logincontainer">
+    <div id="logincontainer" style="background-image: url('/api/imagens/login-wallpaper.jpeg');">
         <form @submit.prevent id="loginform">
             <p> Login </p>
             <input v-model="login_" name="login" placeholder="digite seu login" required>

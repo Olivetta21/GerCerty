@@ -15,6 +15,7 @@ class Contatos extends Janela {
     static _isAddModalOpen = ref(false);
     static _newContactName = ref('');
     static _newContactPhone = ref('');
+    static _newContactAnnotation = ref('');
 
     static get searchQuery_() { return this._searchQuery; }
     static get searchQuery() { return this._searchQuery.value; }
@@ -40,9 +41,16 @@ class Contatos extends Janela {
     static get newContactPhone() { return this._newContactPhone.value; }
     static set newContactPhone(val) { this._newContactPhone.value = val; }
 
+    static get newContactAnnotation_() { return this._newContactAnnotation; }
+    static get newContactAnnotation() { return this._newContactAnnotation.value; }
+    static set newContactAnnotation(val) { this._newContactAnnotation.value = val; }
+
 
     static insertContactInList(contact) {
         //se o contato já existe na lista, adiciona o contato mas agrupadamente
+        if (!this.contacts) {
+            this.contacts = [];
+        }
         let new_contacts_list = [...this.contacts];
         const existIndex = new_contacts_list.findIndex(group => group.name === contact.name);
 
@@ -117,6 +125,7 @@ class Contatos extends Janela {
                     name: c.cliente || 'Desconhecido',
                     phone: c.telefone || c.numero || 'Sem número',
                     original: c.original || '',
+                    annotation: c.anotacao || '',
                     isOriginalVisible: false,
                     isPhoneValid: validarContato(c.telefone || c.numero || '')
                 }));
@@ -133,7 +142,10 @@ class Contatos extends Janela {
         }
     }
 
-    static openAddContact() {
+    static openAddContact(contact) {
+        if (contact) {
+            this.newContactName = contact.name;
+        }
         this.isAddModalOpen = true;
     }
 
@@ -141,6 +153,7 @@ class Contatos extends Janela {
         this.isAddModalOpen = false;
         this.newContactName = '';
         this.newContactPhone = '';
+        this.newContactAnnotation = '';
     }
 
     static async sendWhatsapp(contato) {
@@ -199,7 +212,8 @@ class Contatos extends Janela {
         try {
             const payload = {
                 "nome_cliente": this.newContactName,
-                "numero": this.newContactPhone
+                "numero": this.newContactPhone,
+                "anotacao": this.newContactAnnotation
             };
             const result = await fetchJson("/certificadospage/setCertNumber.php", [{ "h": "add_contato", "b": payload }]);
 
@@ -213,6 +227,7 @@ class Contatos extends Janela {
                     name: this.newContactName,
                     phone: this.newContactPhone,
                     original: 'localmente adicionado',
+                    annotation: this.newContactAnnotation,
                     isOriginalVisible: false,
                     isPhoneValid: validarContato(this.newContactPhone)
                 }
@@ -249,7 +264,8 @@ class Contatos extends Janela {
             const payload = {
                 "id": contact.id,
                 "nome_cliente": contact.name,
-                "numero": contact.phone
+                "numero": contact.phone,
+                "anotacao": contact.annotation
             };
             const result = await fetchJson("/certificadospage/setCertNumber.php", [{ "h": "edit_contato", "b": payload }]);
 
@@ -260,9 +276,32 @@ class Contatos extends Janela {
                 const location = this.findContactLocationById(contact.id);
                 if (location) {
                     const { groupIndex, contactIndex } = location;
+
+
                     updated_contact_list[groupIndex].contacts[contactIndex].name = contact.name;
                     updated_contact_list[groupIndex].contacts[contactIndex].phone = contact.phone;
+                    updated_contact_list[groupIndex].contacts[contactIndex].annotation = contact.annotation;
                     updated_contact_list[groupIndex].contacts[contactIndex].isPhoneValid = validarContato(contact.phone);
+                    
+                    if (updated_contact_list[groupIndex].contacts.length === 1) {
+                        // Se for o único contato do grupo, atualiza o nome do grupo também
+                        updated_contact_list[groupIndex].name = contact.name;
+                    }
+
+                    //verifica se precisa agrupar novamente (o novo nome pode ja existir em outro grupo)
+                    for (let i = 0; i < updated_contact_list.length; i++) {
+                        if (i !== groupIndex && updated_contact_list[i].name === contact.name) {
+                            // Se o nome já existir em outro grupo, move o contato para esse grupo
+                            updated_contact_list[i].contacts.push(updated_contact_list[groupIndex].contacts[contactIndex]);
+                            updated_contact_list[groupIndex].contacts.splice(contactIndex, 1);
+                            if (updated_contact_list[groupIndex].contacts.length === 0) {
+                                // Se o grupo ficar vazio, remove-o
+                                updated_contact_list.splice(groupIndex, 1);
+                            }
+                            break;
+                        }
+                    }
+
                     this.contacts = updated_contact_list;
                 } 
 

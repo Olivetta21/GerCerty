@@ -329,6 +329,7 @@ create table telefones_clientes (
     cliente text check (cliente = upper(cliente)),
     numero text,
     original text,
+    anotacao varchar(200),
     prioridade integer not null,
     data timestamp not null default now(),
     quem_inseriu varchar(32) not null references usuario(login)

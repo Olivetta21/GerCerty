@@ -29,7 +29,7 @@
                             <table class="contacts-table inside">
                                 <thead>
                                     <tr>
-                                        <th>{{ contact.name }}</th>
+                                        <th>{{ contact.name }} <button @click="Contatos.openAddContact(contact)" >+</button></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -57,6 +57,7 @@
                                             </div>
                                             <div v-else class="client-contact">
                                                 <div class="ctt-number">{{ c.phone }}</div>
+                                                <div v-if="c.annotation"> obs: {{ c.annotation }}</div>
                                             </div>
                                             <div>
                                                 <button v-if="validarTelefone(c.phone)" type="button" @click="c.isOriginalVisible = !c.isOriginalVisible">
@@ -82,12 +83,16 @@
                 <h3>Novo Contato</h3>
                 <form @submit.prevent="Contatos.saveNewContact()">
                     <div class="form-group">
-                        <label>Nome do Cliente</label>
+                        <label>Nome Principal</label>
                         <input type="text" v-model="newContactName" placeholder="Ex: João da Silva" required />
                     </div>
                     <div class="form-group">
-                        <label>Contato do cliente</label>
+                        <label>Contato</label>
                         <input type="tel" v-model="newContactPhone" :class="{'numero-errado': !validarTelefone(newContactPhone)}" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Anotação</label>
+                        <input type="text" v-model="newContactAnnotation" placeholder="Ex: Empresa ou Funcionario" />
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-cancel" @click="Contatos.closeAddContact()">Cancelar</button>
@@ -102,12 +107,16 @@
                 <h3>Editando o Contato: {{editing_contact.old_name}}</h3>
                 <form @submit.prevent="Contatos.editContact(editing_contact); cancelEditing()">
                     <div class="form-group">
-                        <label>Nome do Cliente</label>
+                        <label>Nome Principal</label>
                         <input type="text" v-model="editing_contact.name" placeholder="Ex: João da Silva" required />
                     </div>
                     <div class="form-group">
-                        <label>Contato do cliente</label>
-                            <input type="tel" :class="{'numero-errado': !validarTelefone(editing_contact.phone)}"  v-model="editing_contact.phone" required />
+                        <label>Contato</label>
+                        <input type="tel" :class="{'numero-errado': !validarTelefone(editing_contact.phone)}"  v-model="editing_contact.phone" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Anotação</label>
+                        <input type="text" v-model="editing_contact.annotation" placeholder="Ex: Empresa ou Funcionario" />
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-cancel" @click="cancelEditing()">Cancelar</button>
@@ -136,6 +145,7 @@ export default {
             isAddModalOpen: Contatos.isAddModalOpen_,
             newContactName: Contatos.newContactName_,
             newContactPhone: Contatos.newContactPhone_,
+            newContactAnnotation: Contatos.newContactAnnotation_,
             validarTelefone: validarContato,
 
             isEditModalOpen: false,

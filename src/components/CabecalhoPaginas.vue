@@ -38,7 +38,7 @@ export default {
         router,
         Login,
         Certificados,
-        menuVisible: false
+        menuVisible: true
     };
   }
 };
