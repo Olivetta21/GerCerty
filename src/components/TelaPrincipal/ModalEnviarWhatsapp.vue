@@ -56,7 +56,7 @@
 
 <script>
 
-import EnviarWhatsModal from '@/frontend/scripts/Janelas/main/EnviarWhatsModal';
+import EnviarWhatsModal from '@/frontend/scripts/Janelas/certificados/EnviarWhatsModal';
 import Login from '../../frontend/scripts/Janelas/login/Login';
 
 export default {

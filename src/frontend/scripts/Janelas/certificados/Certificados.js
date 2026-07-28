@@ -3,15 +3,15 @@ import { ref } from 'vue';
 //import { startGeneralTour } from './shepHerdTour';
 
 import Janela from '../Janela';
-import MainModal from './MainModal';
 import { addToast } from '../../toastNotification';
 import { fetchJson } from '../../fetcher';
 import { tratarRetornosApi } from "../../commonactions";
 import { floatData } from '../../utils';
+import CertCardModal from './CertCardModal';
 //import { formatarData } from '../utils';
 
-class Main extends Janela {
-    static nome = 'Principal';
+class Certificados extends Janela {
+    static nome = 'Certificados';
     static _opcaoVisivel = ref(false);
     static _loadingCert = ref(false);
     static _startDate = ref(floatData(-20));
@@ -73,11 +73,11 @@ class Main extends Janela {
     //#setters
 
     static before_enter() {
-        console.log('Janela principal foi aberta.');
+        console.log('Janela de certificados foi aberta.');
     }
 
     static after_leave() {
-        console.log('Janela principal foi fechada.');
+        console.log('Janela de certificados foi fechada.');
     }
 
     static swOpcaoVisivel() {
@@ -100,7 +100,7 @@ class Main extends Janela {
             return null;
         }
 
-        const data = await fetchJson('/mainpage/getCertificado.php', [{ "h": "cert_codis", "b": codigos }]);
+        const data = await fetchJson('/certificadospage/getCertificado.php', [{ "h": "cert_codis", "b": codigos }]);
 
         if (data['certificados']) {
             return data['certificados'];
@@ -117,7 +117,7 @@ class Main extends Janela {
     }
 
     static async getCertificadosNome() {
-        const data = await fetchJson('/mainpage/getCertificado.php', [{ "h": "nome_cert", "b": this.nomeCert }]);
+        const data = await fetchJson('/certificadospage/getCertificado.php', [{ "h": "nome_cert", "b": this.nomeCert }]);
 
         if (data['certificados']) {
             return data['certificados'];
@@ -138,7 +138,7 @@ class Main extends Janela {
             return null;
         }
 
-        const data = await fetchJson('/mainpage/getCertificado.php', [{ "h": "intervData", "b": [this.startDate, this.endDate] }]);
+        const data = await fetchJson('/certificadospage/getCertificado.php', [{ "h": "intervData", "b": [this.startDate, this.endDate] }]);
 
         if (data['certificados']) {
             return data['certificados'];
@@ -163,11 +163,11 @@ class Main extends Janela {
 
             if (certs) {
                 this.certs = certs;
-                Main.addNotification("Pesquisa por " + this.typeSearchNome + ". " + this.certs.length + " resultados.");
+                Certificados.addNotification("Pesquisa por " + this.typeSearchNome + ". " + this.certs.length + " resultados.");
             }
 
         } catch (error) {
-            addToast("MainPage/setCertificados", "erro no getCertificado", "error");
+            addToast("certificados/setCertificados", "erro no getCertificado", "error");
         }
 
         this.loadingCert = false;
@@ -195,11 +195,11 @@ class Main extends Janela {
                 });
             }
         } catch (error) {
-            addToast("MainPage/atualizaCerts", "erro no atualizaCerts", "error");
+            addToast("certificados/atualizaCerts", "erro no atualizaCerts", "error");
         }
 
-        if (MainModal.isModalVisible) {  //Se tiver algum certificado aberto, recarrega-lo
-            MainModal.openCertificado(MainModal.cIM);
+        if (CertCardModal.isModalVisible) {  //Se tiver algum certificado aberto, recarrega-lo
+            CertCardModal.openCertificado(CertCardModal.cIM);
         }
     }
 
@@ -257,6 +257,25 @@ class Main extends Janela {
         if (this.notifications.unshift(texto) > 20) this.notifications.splice(20);
     }
 
+
+    static async cancelaUso(crtIndx) {
+        const crt = this.certs[crtIndx];
+        if (!crt) return;
+        var old = crt.localRevelado;
+        crt.localRevelado = 'carregando';
+
+        const data = await fetchJson('/certificadospage/cancelaUso.php', [{ "h": "cert_codi", "b": crt.id }]);
+
+        if (data['success'] && data['local']) {
+            this.addNotification("Uso do certificado " + crt.id + " cancelado.");
+            crt.local = data['local'];
+            old = true;
+        }
+        else tratarRetornosApi(data, "Cancelar uso do certificado");
+
+        crt.localRevelado = old;
+    }
+
 }
 
-export default Main;
+export default Certificados;

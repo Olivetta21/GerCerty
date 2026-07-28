@@ -15,17 +15,35 @@ CREATE TABLE logins_usuario (
 	data TIMESTAMP not null DEFAULT now()
 );
 
+-- Tabela certificado
 CREATE TABLE certificado (
     codi INTEGER PRIMARY KEY,
-    nome VARCHAR(80) NOT NULL,
-	telefone_whatsapp varchar(24) default null,
+    nome VARCHAR(80) NOT NULL UNIQUE,
+    telefone_whatsapp varchar(24) default null,
     vencimento DATE NOT NULL,
     local VARCHAR(16),
     
 	empresa BOOLEAN DEFAULT FALSE,
     respRFB INTEGER REFERENCES certificado(codi) CHECK (respRFB IS NULL OR empresa = TRUE),
     
-    versao INTEGER NOT NULL
+    versao INTEGER NOT NULL,
+	
+	responsavel varchar(64),
+	emusopor VARCHAR(32) references usuario(login),
+	
+    -- Obriga o valor a estar em maiúsculas
+    CONSTRAINT check_certificado_nome_upper
+        CHECK (nome = UPPER(nome)),
+		
+    CONSTRAINT check_certificado_local_upper
+        CHECK (local = UPPER(local)),
+
+    -- Permite apenas caracteres ASCII imprimíveis
+    CONSTRAINT check_certificado_nome_somenteascii
+        CHECK (nome ~ '^[\x20-\x7E]+$')
+		
+    CONSTRAINT check_certificado_local_somenteascii
+        CHECK (local ~ '^[\x20-\x7E]+$')
 );
 
 
@@ -33,7 +51,7 @@ CREATE TABLE cronograma (
     id SERIAL PRIMARY KEY,
     cert_codi INTEGER NOT NULL REFERENCES certificado(codi),
     cert_versao INTEGER NOT NULL,
-    type VARCHAR(4) NOT NULL CHECK (type IN ('NOTF', 'AGND', 'REVL', 'PRBL')),
+    type VARCHAR(4) NOT NULL CHECK (type IN ('NOTF', 'AGND', 'REVL', 'PRBL', 'DVLV')),
     usuario_login VARCHAR(32) NOT NULL REFERENCES usuario(login),
     nota VARCHAR(256),
     data TIMESTAMP DEFAULT NOW(),
@@ -116,7 +134,8 @@ create table permissoes (
 
     -- VIEWS
     CREATE OR REPLACE VIEW vw_certificado_cronograma as (    
-        select c.codi as id, c.versao, 'escondido' as local, c.empresa, c.respRFB as respRFB_id, v.revl as usos, upper(c.nome) as nome, c.vencimento as venc, i.notf, i.agnd, i.prbl, c.telefone_whatsapp from certificado c
+        select c.codi as id, c.versao, 'escondido' as local, c.empresa, c.respRFB as respRFB_id, v.revl as usos, upper(c.nome) as nome,
+        c.vencimento as venc, i.notf, i.agnd, i.prbl, c.telefone_whatsapp, c.responsavel, c.emusopor from certificado c
         left join (
             SELECT 
                 cert_codi, cert_versao,
@@ -207,7 +226,11 @@ BEGIN
     END IF;
 
     IF p_nome IS NOT NULL THEN
-        sql := sql || format(' AND nome ILIKE %L', '%'||p_nome||'%');
+        sql := sql || format(
+            ' AND (nome ILIKE %L OR responsavel ILIKE %L)',
+            '%' || p_nome || '%',
+            '%' || p_nome || '%'
+        );
     END IF;
 
     IF p_dataini IS NOT NULL THEN

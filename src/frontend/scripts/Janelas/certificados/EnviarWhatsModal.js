@@ -1,7 +1,7 @@
 import { ref } from "vue";
 import { fetchJson } from "../../fetcher";
 import Login from "../login/Login";
-import { validarTelefone } from "../../utils";
+import { validarContato } from "../../utils";
 import { addToast } from "../../toastNotification";
 
 //import Main from "./Main";
@@ -49,7 +49,7 @@ class EnviarWhatsModal {
     }
 
     static async getNumbers(nome) {
-        const result = await fetchJson("/mainpage/getNumbers.php", [{ "h": "nome", "b": nome }]);
+        const result = await fetchJson("/certificadospage/getNumbers.php", [{ "h": "nome", "b": nome }]);
         console.log(result.numeros);
 
         return result.numeros ?? [];
@@ -63,7 +63,7 @@ class EnviarWhatsModal {
     static async sendWhats(numero) {
         const crt = this.certificado;
         const telefone = numero ?? crt.telefone_whatsapp ?? null;
-        if (!validarTelefone(telefone)) {
+        if (!validarContato(telefone)) {
             if (!confirm("Possivelmente o telefone:\n" + telefone + "\n Está incorreto, quer tentar enviar mensagem mesmo assim?")) {
                 return;
             }
@@ -91,7 +91,7 @@ class EnviarWhatsModal {
         const diffTime = vencimento - hoje;
         const diffDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) - 1;
 
-        const result = await fetchJson("/mainpage/getNumbers.php", [{ "h": "info", "b": `${nomeCertificado} - ${telefone}` }]);
+        const result = await fetchJson("/certificadospage/getNumbers.php", [{ "h": "info", "b": `${nomeCertificado} - ${telefone}` }]);
         if (!result || !result.info || result.info !== `${nomeCertificado} - ${telefone}`) {
             addToast("sendWhats", "Erro ao notificar cliente", "error");
             return;
@@ -117,7 +117,7 @@ class EnviarWhatsModal {
     }
 
     static async setCertNumber(numero) {
-        const result = await fetchJson("/mainpage/setCertNumber.php", [{ "h": "set_numero", "b": { "cert_codigo": this.certificado.id, "numero": numero } }]);
+        const result = await fetchJson("/certificadospage/setCertNumber.php", [{ "h": "set_numero", "b": { "cert_codigo": this.certificado.id, "numero": numero } }]);
         console.log(result);
         if (result && result.success) {
             addToast("setCertNumber", "Número atualizado com sucesso!", "success");

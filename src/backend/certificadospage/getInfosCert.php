@@ -14,7 +14,7 @@ if (isset($_POST['cert_codis'])){
     $codis_placeholder = implode(',',array_fill(0, count($cert_codis), '?'));
 
     $sql = "
-    select id as codi, usos as revl, notf, agnd, prbl
+    select id as codi, usos as revl, notf, agnd, prbl, responsavel, emusopor
     from vw_certificado_cronograma
     where id in ($codis_placeholder);
     ";

@@ -9,6 +9,7 @@
             <div id="cabecalho-vert" v-if="menuVisible"> 
                 <p @click="menuVisible = !menuVisible"> <span class="close"> &times; </span> </p>
                 <button @click="router.push({ name: 'inicio' })" > Inicio </button>
+                <button @click="router.push({ name: 'certificados' })" > Certificados </button>
                 <button v-if="Login.verifPerm(3)" @click="router.push({ name: 'pagamentos' })" > Pagamentos </button>
                 <button v-if="Login.verifPerm(4) || Login.verifPerm(5)" @click="router.push({ name: 'relatorios' })" > Relatórios </button>
                 <button v-if="Login.verifPerm(1)" @click="router.push({ name: 'vendas' })" > Vendas </button>
@@ -16,7 +17,7 @@
                 <button @click="router.push({ name: 'contatos' })" > Contatos </button>
                 
                 <div id="hnotifcont" class="whitesoftshadow scroll-brown">
-                    <p v-for="(notif, index) in Main.notifications" :key="index" class="hnotif"> {{ notif }} </p>
+                    <p v-for="(notif, index) in Certificados.notifications" :key="index" class="hnotif"> {{ notif }} </p>
                 </div>
             </div>
             <div id="pagina">
@@ -27,7 +28,7 @@
 </template>
 
 <script>
-import Main from '../frontend/scripts/Janelas/main/Main';
+import Certificados from '../frontend/scripts/Janelas/certificados/Certificados';
 import Login from '../frontend/scripts/Janelas/login/Login';
 import router from '../router';
 
@@ -36,8 +37,8 @@ export default {
     return {
         router,
         Login,
-        Main,
-        menuVisible: true
+        Certificados,
+        menuVisible: false
     };
   }
 };
@@ -50,7 +51,7 @@ export default {
         display: flex;
         flex-direction: column;
 
-        padding: var(--padding-normal);
+        
     }
 
     #cabecalho-hori {

@@ -17,44 +17,59 @@
                 <div class="spinner" style="border: 4px solid rgba(0,0,0,0.1); width: 36px; height: 36px; border-radius: 50%; border-left-color: #007bff; animation: spin 1s linear infinite;"></div>
                 <p style="margin-top:10px; color:#666;">Buscando...</p>
             </div>
-            <table v-else class="contacts-table">
+            <table v-else class="contacts-table outside">
                 <thead>
                     <tr>
                         <th>Contato</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="contact in contacts" :key="contact.id">
+                    <tr v-for="contact in contacts" :key="contact.name">
                         <td>
-                            <div>
-                                <button v-if="validarTelefone(contact.phone)" type="button" @click="Contatos.sendWhatsapp(contact)">
-                                    <span> 📞 </span>
-                                </button>
-                                <button v-else type="button" @click="contact.isOriginalVisible = !contact.isOriginalVisible">
-                                    <span> 🔍 </span>
-                                </button>
-                                <button v-if="Login.verifPerm(15)" type="button" @click="startEditing(contact)">
-                                    <span> ✏️ </span>
-                                </button>
-                                <button v-if="Login.verifPerm(17)" type="button" @click="Contatos.deleteContact(contact)">
-                                    <span> 🗑️ </span>
-                                </button>
-                            </div>
-                            <div v-if="contact.isOriginalVisible" class="client-contact ctt-original-info">
-                                <div class="ctt-number">{{ contact.original.replace(/;+/g, "\n") }}</div>
-                            </div>
-                            <div v-else class="client-contact">
-                                <div class="ctt-name">{{ contact.name }}</div>
-                                <div class="ctt-number">{{ contact.phone }}</div>
-                            </div>
-                            <div>
-                                <button v-if="validarTelefone(contact.phone)" type="button" @click="contact.isOriginalVisible = !contact.isOriginalVisible">
-                                    <span> 🔍 </span>
-                                </button>
-                            </div>                            
+                            <table class="contacts-table inside">
+                                <thead>
+                                    <tr>
+                                        <th>{{ contact.name }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="c in contact.contacts" :key="c.id">
+                                        <td>
+                                            <div>
+                                                <button v-if="validarTelefone(c.phone) === 'phone'" type="button" @click="Contatos.sendWhatsapp(c)">
+                                                    <span> 📞 </span>
+                                                </button>
+                                                <button v-else-if="validarTelefone(c.phone) === 'email'" type="button" @click="Contatos.sendEmail(c)">
+                                                    <span> 📨 </span>
+                                                </button>
+                                                <button v-else type="button" @click="c.isOriginalVisible = !c.isOriginalVisible">
+                                                    <span> 🔍 </span>
+                                                </button>
+                                                <button v-if="Login.verifPerm(15)" type="button" @click="startEditing(c)">
+                                                    <span> ✏️ </span>
+                                                </button>
+                                                <button v-if="Login.verifPerm(17)" type="button" @click="Contatos.deleteContact(c)">
+                                                    <span> 🗑️ </span>
+                                                </button>
+                                            </div>
+                                            <div v-if="c.isOriginalVisible" class="client-contact ctt-original-info">
+                                                <div class="ctt-number">{{ c.original.replace(/;+/g, "\n") }}</div>
+                                            </div>
+                                            <div v-else class="client-contact">
+                                                <div class="ctt-number">{{ c.phone }}</div>
+                                            </div>
+                                            <div>
+                                                <button v-if="validarTelefone(c.phone)" type="button" @click="c.isOriginalVisible = !c.isOriginalVisible">
+                                                    <span> 🔍 </span>
+                                                </button>
+                                            </div>                            
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>                      
                         </td>
                     </tr>
-                    <tr v-if="contacts.length === 0">
+                    <tr v-if="!contacts || contacts.length === 0">
                         <td colspan="2" class="no-results">Nenhum contato encontrado. Utilize a busca acima.</td>
                     </tr>
                 </tbody>
@@ -71,8 +86,8 @@
                         <input type="text" v-model="newContactName" placeholder="Ex: João da Silva" required />
                     </div>
                     <div class="form-group">
-                        <label>Número do Telefone</label>
-                        <input type="tel" v-model="newContactPhone" :class="{'numero-errado': !validarTelefone(newContactPhone)}" placeholder="Ex: (11) 99999-9999" required />
+                        <label>Contato do cliente</label>
+                        <input type="tel" v-model="newContactPhone" :class="{'numero-errado': !validarTelefone(newContactPhone)}" required />
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-cancel" @click="Contatos.closeAddContact()">Cancelar</button>
@@ -91,8 +106,8 @@
                         <input type="text" v-model="editing_contact.name" placeholder="Ex: João da Silva" required />
                     </div>
                     <div class="form-group">
-                        <label>Número do Telefone</label>
-                        <input type="tel" :class="{'numero-errado': !validarTelefone(editing_contact.phone)}"  v-model="editing_contact.phone" placeholder="Ex: (11) 99999-9999" required />
+                        <label>Contato do cliente</label>
+                            <input type="tel" :class="{'numero-errado': !validarTelefone(editing_contact.phone)}"  v-model="editing_contact.phone" required />
                     </div>
                     <div class="modal-actions">
                         <button type="button" class="btn-cancel" @click="cancelEditing()">Cancelar</button>
@@ -105,7 +120,7 @@
 </template>
 
 <script>
-import { validarTelefone } from '@/frontend/scripts/utils';
+import { validarContato } from '@/frontend/scripts/utils';
 import Contatos from '../../frontend/scripts/Janelas/contatos/Contatos';
 import Login from '@/frontend/scripts/Janelas/login/Login';
 
@@ -121,7 +136,7 @@ export default {
             isAddModalOpen: Contatos.isAddModalOpen_,
             newContactName: Contatos.newContactName_,
             newContactPhone: Contatos.newContactPhone_,
-            validarTelefone,
+            validarTelefone: validarContato,
 
             isEditModalOpen: false,
             editing_contact: null,
@@ -240,18 +255,30 @@ export default {
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
+.contacts-table.inside th {
+    border-top: 1px solid var(--cor-borda-escuro);
+}
+
 tr {
     background-color: white;
     text-wrap: wrap;
 }
 
 td {
+    border: none;
     display: flex;
     align-items: center;
     justify-content: flex-start;
     width: 100%;
     gap: 10px;
     user-select: text;
+}
+
+.contacts-table.outside>tbody>tr>td {
+    padding: 0 0 10px 0;
+}
+.contacts-table.outside>tbody>tr>td:hover {
+    background-color: white;
 }
 
 .client-contact{
@@ -270,7 +297,7 @@ td {
 
 .contacts-table th, 
 .contacts-table td {
-    padding: 12px 15px;
+    
     text-align: left;
     border-bottom: 1px solid #f0f0f0;
 }

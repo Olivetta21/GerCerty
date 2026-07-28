@@ -11,9 +11,25 @@ verifPerm(9, $user_permissions);
 if (isset($_POST['cron_id'])) {
     $cron_id = json_decode($_POST['cron_id'], true);
 
-    $sql = "select cert_codi from fn_delete_cronograma(:cron_id);";
-
+    
     try {
+        $sql = "select type, usuario_login from cronograma where id = :cron_id and type in ('AGND', 'NOTF', 'PRBL');";
+        $stmt = $pdo->prepare($sql);
+        $stmt->bindParam(':cron_id', $cron_id, PDO::PARAM_INT);
+        $stmt->execute();
+
+        if ($stmt->rowCount() != 1) {
+            echo correctJson("error", "Cronograma não encontrado ou não é do tipo permitido para exclusão");
+            exit;
+        }
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($row['usuario_login'] !== $credentials['usuario']) {
+            echo correctJson("error", "Você não é o proprietário deste cronograma");
+            exit;
+        }
+
+        $sql = "select cert_codi from fn_delete_cronograma(:cron_id);";
         $stmt = $pdo->prepare($sql);
         $stmt->bindParam(':cron_id', $cron_id, PDO::PARAM_INT);
         $stmt->execute();

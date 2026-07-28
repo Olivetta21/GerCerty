@@ -13,6 +13,8 @@ class Login extends Janela {
     static nome = 'Login';
     static login = "";
 
+    static toGoIfFail = null;
+
     static async before_enter() {
         await this.fazerLogoff();
         document.title = "Certificados";
@@ -73,7 +75,7 @@ class Login extends Janela {
         return resp;
     }
 
-    static setLogged(data, to = "inicio") {
+    static setLogged(data, to) {
         if (data['success']) {
             const usuario = data['usuario'];
 
@@ -87,7 +89,7 @@ class Login extends Janela {
 
             pgUpdates.start(usuario['last_update'] ?? 0);
 
-            router.push({ name: to });
+            router.push({ name: to ?? 'inicio' });
 
             addToast('Bom dia', this.USERNAME + '!\nUltimo Login: ' + usuario['last_login'], 'success');
             return true;
@@ -116,7 +118,8 @@ class Login extends Janela {
 
         const resp = await fetchJson("/loginpage/login.php", [{ "h": "usercred", "b": [login, senha] }]);
 
-        this.setLogged(resp);
+        this.setLogged(resp, this.toGoIfFail);
+        this.toGoIfFail = null;
 
         const diferenca = 1000 - (Date.now() - lastPrssdLoginTime);
         if (diferenca > 0) await sleep(diferenca);

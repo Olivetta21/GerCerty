@@ -143,7 +143,11 @@
 }
 
 .mmc-body-cron-cron.PRBL {
-    border-right: 1px solid red;
+    border-right: 1px solid rgb(0, 174, 255);
+}
+
+.mmc-body-cron-cron.DVLV {
+    border-right: 1px solid rgb(238, 255, 0);
 }
 
 .mmc-body-cron-cron:hover {
@@ -288,6 +292,9 @@ th.col-fit-content {
 }
 
 
+.loc-loading {
+    width: 1.2rem;
+}
 
 
 

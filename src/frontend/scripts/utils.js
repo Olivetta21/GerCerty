@@ -77,10 +77,21 @@ export function numToStr(num) {
     return num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
-export function validarTelefone(telefone) {
-    if (!telefone) return false;
+export function validarContato(contato_str) {
+    if (!contato_str || typeof contato_str !== 'string') {
+        return false;
+    }
 
-    const numero = telefone.replace(/\D/g, '');
+    const contato = contato_str.trim();
+
+    // Validação de e-mail
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (emailRegex.test(contato)) {
+        return 'email';
+    }
+
+    // Validação de telefone
+    const numero = contato.replace(/\D/g, '');
 
     // Deve ter 10 ou 11 dígitos
     if (!/^\d{10,11}$/.test(numero)) {
@@ -101,5 +112,5 @@ export function validarTelefone(telefone) {
         }
     }
 
-    return true;
+    return 'phone';
 }

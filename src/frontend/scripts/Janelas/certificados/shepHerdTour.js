@@ -1,4 +1,4 @@
-import Shepherd from '../../../../../node_modules/shepherd.js';
+import Shepherd from 'shepherd.js';
 import '../../../../../node_modules/shepherd.js/dist/css/shepherd.css';
 
 export function startGeneralTour() {

@@ -14,6 +14,7 @@ router.beforeEach(async (to, from) => {
     fromMeta?.classe?.before_leave?.()
 
     if (to.meta?.requiresAuth && !(await Login.isAuthenticated(to.name))) {
+        Login.toGoIfFail = to.name
         return { name: 'login' }
     }
 

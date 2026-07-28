@@ -163,7 +163,7 @@ if (isset($_POST['set_numero'])){
     verifPerm(16, $user_permissions);
 
     $dados = json_decode($_POST['add_contato'], true);
-    $resultado = insertNovoTelefone($credentials, removerAcentos($dados['nome_cliente']), removerEspacos($dados['numero']));
+    $resultado = insertNovoTelefone($credentials, removerAcentos($dados['nome_cliente']), $dados['numero']);
     if (isset($resultado["success"])) {
         addAtualizacao("CTTA", explode(' ', trim($dados['nome_cliente']))[0] ?? '', $credentials);
         echo correctJson2(["success" => $resultado, "id" => $pdo->lastInsertId()]);
@@ -176,7 +176,7 @@ if (isset($_POST['set_numero'])){
     verifPerm(15, $user_permissions);
 
     $dados = json_decode($_POST['edit_contato'], true);
-    $resultado = updateTelefone($credentials, $dados['id'], removerAcentos($dados['nome_cliente']), removerEspacos($dados['numero']));
+    $resultado = updateTelefone($credentials, $dados['id'], removerAcentos($dados['nome_cliente']), $dados['numero']);
     if (isset($resultado["success"])) {
         addAtualizacao("CTTE", explode(' ', trim($dados['nome_cliente']))[0] ?? '', $credentials);
         echo correctJson2(["success" => $resultado]);

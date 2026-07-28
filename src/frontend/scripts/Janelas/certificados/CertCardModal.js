@@ -1,13 +1,13 @@
 import { ref } from "vue";
 
-import Main from "./Main";
 import { addToast } from "../../toastNotification";
+import Certificados from "./Certificados";
 import { fetchJson } from "../../fetcher";
 import { tratarRetornosApi } from "../../commonactions";
 import Login from "../login/Login";
 
 
-class MainModal {
+class CertCardModal {
     //Principal
     static _isModalVisible = ref(false);
     static _loadingModal = ref(false);
@@ -45,7 +45,7 @@ class MainModal {
     static get isCronAdderVisible() {return this._isCronAdderVisible.value}
 
     static async getCronograma(cert_codi, cert_versao) {
-        const data = await fetchJson('/mainpage/getCronograma.php', [{"h":"cert_codi","b":cert_codi}, {"h":"cert_versao","b":cert_versao}]);
+        const data = await fetchJson('/certificadospage/getCronograma.php', [{"h":"cert_codi","b":cert_codi}, {"h":"cert_versao","b":cert_versao}]);
         if (data['cronograma']){
             return data['cronograma'];
         }
@@ -55,19 +55,19 @@ class MainModal {
     static async deleteCronograma(cron_id){        
         if (!Login.verifPerm(9, "Deletar um cronograma")) return;
 
-        const data = await fetchJson('/mainpage/deleteCronograma.php', [{"h":"cron_id","b":cron_id}]);
+        const data = await fetchJson('/certificadospage/deleteCronograma.php', [{"h":"cron_id","b":cron_id}]);
 
         if (data['success']){
             addToast("Deletar cronograma", "deletado com sucesso!", "success");
-            await Main.atualizaCerts([Main.certs[this.cIM].id]);
-            Main.addNotification("Deletou cronograma. "+cron_id);
+            await Certificados.atualizaCerts([Certificados.certs[this.cIM].id]);
+            Certificados.addNotification("Deletou cronograma. "+cron_id);
             console.log("deleteCronograma - cuide disso, pesquisa por indice");
         }
         else tratarRetornosApi(data, "Remover um cronograma");
     }
 
     static async changeVersions(cert_codi, cert_versao, forward){
-        const data = await fetchJson('/mainpage/changeVersionCronograma.php',
+        const data = await fetchJson('/certificadospage/changeVersionCronograma.php',
             [{"h":"cert_codi","b":cert_codi},{"h":"cert_versao","b":cert_versao},{"h":"direction","b":forward}]
         );
     
@@ -83,12 +83,12 @@ class MainModal {
     }
 
     static async insertCronDB(cert_codi, cert_versao, tipo, nota) {
-        const data = await fetchJson('/mainpage/insertCronDB.php',
+        const data = await fetchJson('/certificadospage/insertCronDB.php',
             [{"h":"cert_codi","b":cert_codi},{"h":"cert_versao","b":cert_versao},{"h":"type","b":tipo},{"h":"nota","b":nota}]
         );
         if (data['success']){            
             //Recarrega o certificado
-            await Main.atualizaCerts([Main.certs[this.cIM].id]);
+            await Certificados.atualizaCerts([Certificados.certs[this.cIM].id]);
             return true;
         }
         else tratarRetornosApi(data, "Adicionar um cronograma");
@@ -102,16 +102,18 @@ class MainModal {
             return;
         }
 
-        const data = await fetchJson('/mainpage/getInfosCert.php', [{"h":"cert_codis","b":cert_codis}]);
+        const data = await fetchJson('/certificadospage/getInfosCert.php', [{"h":"cert_codis","b":cert_codis}]);
 
         if (data["infos"]){
             for (const i of data["infos"]){
-                const found = Main.findCertIndex(i.codi);
+                const found = Certificados.findCertIndex(i.codi);
                 if (found > -1) {
-                    Main.certs[found].usos = i.revl;
-                    Main.certs[found].prbl = i.prbl;
-                    Main.certs[found].agnd = i.agnd;
-                    Main.certs[found].notf = i.notf;
+                    Certificados.certs[found].usos = i.revl;
+                    Certificados.certs[found].prbl = i.prbl;
+                    Certificados.certs[found].agnd = i.agnd;
+                    Certificados.certs[found].notf = i.notf;
+                    Certificados.certs[found].responsavel = i.responsavel;
+                    Certificados.certs[found].emusopor = i.emusopor;
                 }
             }
         }
@@ -130,36 +132,36 @@ class MainModal {
         await this.attInfosCert(cert_codis);
 
         
-        let areLooking = cert_codis.findIndex(cc => (Main.certs[this.cIM] && cc === Main.certs[this.cIM].id)); //se o usuario estiver olhando para um cronograma, renovalo; senao, apenas deletar
+        let areLooking = cert_codis.findIndex(cc => (Certificados.certs[this.cIM] && cc === Certificados.certs[this.cIM].id)); //se o usuario estiver olhando para um cronograma, renovalo; senao, apenas deletar
         if (areLooking > -1){
             areLooking = cert_codis.splice(areLooking, 1)[0];
         }
         else areLooking = 'nao';
         
         for (const cc of cert_codis){
-            let found = Main.findCertIndex(cc);
+            let found = Certificados.findCertIndex(cc);
 
             if (found > -1){
-                Main.certs[found].crono = null;
+                Certificados.certs[found].crono = null;
             }
         }
         if (areLooking === 'nao') return;
         
-        let crtIndx = Main.findCertIndex(areLooking);
+        let crtIndx = Certificados.findCertIndex(areLooking);
         if (crtIndx < 0) return;
 
         //o objetivo aqui é capturar os cronogramas somente do modal aberto, e deixar os outros pra depois.
         this.loadingModalCron = true;
         try {
-            const cronograma_ = await this.getCronograma(Main.certs[crtIndx].id, Main.certs[crtIndx].versao);
+            const cronograma_ = await this.getCronograma(Certificados.certs[crtIndx].id, Certificados.certs[crtIndx].versao);
 
             //console.log('dentro de opencertificado:' , cronograma_);
 
             if (cronograma_) {
-                Main.certs[crtIndx].crono = cronograma_;                           
+                Certificados.certs[crtIndx].crono = cronograma_;                           
             }
             else {
-                Main.certs[crtIndx].crono = null;
+                Certificados.certs[crtIndx].crono = null;
                 addToast("MainModal/attCronOnCert", "nenhum cronograma para essa versao", "error");
             }
 
@@ -175,7 +177,7 @@ class MainModal {
         this.isModalVisible = true;
         
         //se esse certificado ja conter o cronograma, nao realizar o query
-        if (Main.certs[crtIndx].crono) {
+        if (Certificados.certs[crtIndx].crono) {
             console.warn("certificado ja com cronograma, cancelando query");   
             return;
         }
@@ -188,19 +190,19 @@ class MainModal {
         //certificado:
         //id: 0, usos: 0, nome: 'null', venc: '0000-00-00', notf: 0, agnd: 0, prbl: 0
 
-        this.attCronOnCert([Main.certs[this.cIM].id]);                    
+        this.attCronOnCert([Certificados.certs[this.cIM].id]);                    
     }
 
     static async changeVersaoReOpen(crtIndx, direction) {        
         this.loadingModalCron = true;
         try {
-            const newVersion = await this.changeVersions(Main.certs[crtIndx].id, Main.certs[crtIndx].versao, direction);
+            const newVersion = await this.changeVersions(Certificados.certs[crtIndx].id, Certificados.certs[crtIndx].versao, direction);
 
             //console.log('newVersion' , newVersion);
 
             if (newVersion) {
-                Main.certs[crtIndx].versao = newVersion;  
-                await this.attCronOnCert([Main.certs[crtIndx].id]);                          
+                Certificados.certs[crtIndx].versao = newVersion;  
+                await this.attCronOnCert([Certificados.certs[crtIndx].id]);                          
             }
             else {
                 addToast("Cronograma", "nenhum cronograma encontrado", "warn");
@@ -212,34 +214,34 @@ class MainModal {
         this.loadingModalCron = false;
     }
 
+    static async helper_revelarLocal_semAbrirModal(crtIndx) {
+        this.cIM = crtIndx;
+        await this.revelarLocal();
+    }
+
     static async revelarLocal() {
         if (!Login.verifPerm(8, "Ver local do certificado")) return;
         
         const crt_index = this.cIM;
         
-        Main.certs[crt_index].localRevelado = 'carregando';
+        Certificados.certs[crt_index].localRevelado = 'carregando';
 
         //Tenta adicionar o cronograma de visualização
         try {
-            const result = await this.insertCronDB(Main.certs[crt_index].id, Main.certs[crt_index].versao, "REVL", "");   
-            Main.certs[crt_index].localRevelado = 'carregando'; //denovo porque a função acima remove essa variavel     
-            //se o cronograma foi adicionado com sucesso...
-            if (result) {
-                const data = await fetchJson('/mainpage/getLocalCertificado.php', [{"h":"cert_codi","b":Main.certs[crt_index].id}]);
-                if (data['local']){
-                    Main.certs[crt_index].local = data['local'];
-                    Main.certs[crt_index].localRevelado = true;
-                    Main.addNotification("Revelou:"+Main.certs[crt_index].id);
-                    return;
-                }
-                else tratarRetornosApi(data, "Buscar local");
+            const data = await fetchJson('/certificadospage/getLocalCertificado.php', [{"h":"cert_codi","b":Certificados.certs[crt_index].id}]);
+            if (data['local']){
+                Certificados.certs[crt_index].local = data['local'];
+                Certificados.certs[crt_index].localRevelado = true;
+                Certificados.addNotification("Revelou:"+Certificados.certs[crt_index].id);
+                return;
             }
+            else tratarRetornosApi(data, "Buscar local");
         } catch (error) {
             addToast("MainModal/revelarLocal", "erro no addREVL", "error");
             console.log("MainModal/revelarLocal", error);
         }
         
-        Main.certs[crt_index].localRevelado = false;
+        Certificados.certs[crt_index].localRevelado = false;
     }
 
     static switchModal() {
@@ -271,10 +273,10 @@ class MainModal {
             }
         }
         
-        const resultado = await this.insertCronDB(Main.certs[this.cIM].id, Main.certs[this.cIM].versao, this.cronTitulo, this.cronNota);
+        const resultado = await this.insertCronDB(Certificados.certs[this.cIM].id, Certificados.certs[this.cIM].versao, this.cronTitulo, this.cronNota);
 
         if (resultado === true) {
-            Main.addNotification("Ins. Cron. "+this.cronTitulo+" em "+Main.certs[this.cIM].id);
+            Certificados.addNotification("Ins. Cron. "+this.cronTitulo+" em "+Certificados.certs[this.cIM].id);
             addToast("Cronograma", "adicionado!", "success");
         }
         else {
@@ -284,6 +286,25 @@ class MainModal {
         this.closeCronAdder();
         console.log("addCronograma - cuide disso, pesquisa por indice");
     }
+
+
+    responsavel_name = "";    
+    static startEditingResponsavel() {
+        Certificados.certs[this.cIM].user_is_editing_responsavel = true;
+        CertCardModal.responsavel_name = Certificados.certs[this.cIM].responsavel;
+    }
+
+    static async saveEditingResponsavel() {
+
+        const res = await fetchJson('/certificadospage/setResponsavelName.php', [{"h":"cert_codi","b":Certificados.certs[this.cIM].id},{"h":"responsavel","b":CertCardModal.responsavel_name}]);
+        if (res['success']){
+            addToast("Responsável", "modificado com sucesso!", "success");
+            Certificados.addNotification("Modificou responsavel de "+Certificados.certs[this.cIM].id+" para "+CertCardModal.responsavel_name);
+        }
+        else tratarRetornosApi(res, "Modificar responsável do certificado");
+
+        Certificados.certs[this.cIM].user_is_editing_responsavel = false;
+    }
 }
 
-export default MainModal;
+export default CertCardModal;

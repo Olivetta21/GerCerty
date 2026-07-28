@@ -2,13 +2,13 @@ import { ref } from "vue";
 import Janela from "../Janela";
 import { fetchJson } from "../../fetcher";
 import { addToast } from "../../toastNotification";
-import { validarTelefone } from "../../utils";
+import { validarContato } from "../../utils";
 
 class Contatos extends Janela {
     static nome = 'Contatos';
 
     static _searchQuery = ref('');
-    static _contacts = ref([]);
+    static _contacts = ref(null); //Array de objetos {nome: ContatoNome, contatos: [array]}
     static _isLoading = ref(false);
 
     // Modal state
@@ -40,6 +40,66 @@ class Contatos extends Janela {
     static get newContactPhone() { return this._newContactPhone.value; }
     static set newContactPhone(val) { this._newContactPhone.value = val; }
 
+
+    static insertContactInList(contact) {
+        //se o contato já existe na lista, adiciona o contato mas agrupadamente
+        let new_contacts_list = [...this.contacts];
+        const existIndex = new_contacts_list.findIndex(group => group.name === contact.name);
+
+        if (existIndex !== -1) {
+            // Adiciona o novo contato ao array de contatos existentes
+            new_contacts_list[existIndex].contacts.push(contact);
+        } else {
+            // Adiciona o novo contato como um novo grupo
+            new_contacts_list.push({
+                name: contact.name,
+                contacts: [contact]
+            });
+        }
+
+        this.contacts = new_contacts_list;
+    }
+
+    static setContactList(newContacts) {
+        // Agrupa os contatos por nome
+        const groupedContacts = newContacts.reduce((acc, contact) => {
+            const existingGroup = acc.find(group => group.name === contact.name);
+            if (existingGroup) {
+                existingGroup.contacts.push(contact);
+            } else {
+                acc.push({
+                    name: contact.name,
+                    contacts: [contact]
+                });
+            }
+            return acc;
+        }, []);
+
+        this.contacts = groupedContacts;
+    }
+
+    static findContactById(contactId) {
+        for (const group of this.contacts) {
+            const foundContact = group.contacts.find(c => c.id === contactId);
+            if (foundContact) {
+                return foundContact;
+            }
+        }
+        return null; // Retorna null se não encontrar o contato
+    }
+
+    static findContactLocationById(contactId) {
+        for (let groupIndex = 0; groupIndex < this.contacts.length; groupIndex++) {
+            const group = this.contacts[groupIndex];
+            const contactIndex = group.contacts.findIndex(c => c.id === contactId);
+            if (contactIndex !== -1) {
+                return { groupIndex, contactIndex };
+            }
+        }
+        return null; // Retorna null se não encontrar o contato
+    }
+
+
     static async searchContacts() {
         if (!this.searchQuery || this.searchQuery.trim() === '') {
             this.contacts = [];
@@ -49,19 +109,21 @@ class Contatos extends Janela {
         this.isLoading = true;
 
         try {
-            const data = await fetchJson('/mainpage/getNumbers.php', [{ "h": "nome", "b": this.searchQuery }]);
+            const data = await fetchJson('/certificadospage/getNumbers.php', [{ "h": "nome", "b": this.searchQuery }]);
 
             if (data && data.numeros) {
-                this.contacts = data.numeros.map((c, index) => ({
+                const new_contacts = data.numeros.map((c, index) => ({
                     id: c.id || index,
                     name: c.cliente || 'Desconhecido',
                     phone: c.telefone || c.numero || 'Sem número',
                     original: c.original || '',
                     isOriginalVisible: false,
-                    isPhoneValid: validarTelefone(c.telefone || c.numero || '')
+                    isPhoneValid: validarContato(c.telefone || c.numero || '')
                 }));
+
+                this.setContactList(new_contacts);
             } else {
-                this.contacts = [];
+                this.contacts = null;
             }
         } catch (error) {
             console.error("Erro ao buscar contatos:", error);
@@ -85,13 +147,13 @@ class Contatos extends Janela {
         const nome_cliente = contato.name;
         const telefone = contato.phone;
 
-        if (!validarTelefone(telefone)) {
+        if (validarContato(telefone) !== 'phone') {
             if (!confirm("Possivelmente o telefone:\n" + telefone + "\n Está incorreto, quer tentar enviar mensagem mesmo assim?")) {
                 return;
             }
         }
 
-        const data = await fetchJson('/mainpage/getNumbers.php', [{ "h": "info", "b": `ctt: ${nome_cliente} - ${telefone}` }]);
+        const data = await fetchJson('/certificadospage/getNumbers.php', [{ "h": "info", "b": `ctt: ${nome_cliente} - ${telefone}` }]);
         if (!data || !data.info || data.info !== `ctt: ${nome_cliente} - ${telefone}`) {
             addToast("sendWhats", "Erro ao notificar cliente", "error");
             return;
@@ -101,6 +163,28 @@ class Contatos extends Janela {
 
         window.open(link, '_blank');
     }
+
+    static async sendEmail(contato) {
+        const nome_cliente = contato.name;
+        const email = contato.phone;
+        
+        if (validarContato(email) !== 'email') {
+            if (!confirm("Possivelmente o email:\n" + email + "\n Está incorreto, quer tentar enviar mensagem mesmo assim?")) {
+                return;
+            }
+        }
+
+        const data = await fetchJson('/certificadospage/getNumbers.php', [{ "h": "info", "b": `ctt: ${nome_cliente} - ${email}` }]);
+        if (!data || !data.info || data.info !== `ctt: ${nome_cliente} - ${email}`) {
+            addToast("sendEmail", "Erro ao notificar cliente", "error");
+            return;
+        }
+
+        const link = `mailto:${email}?subject=Contato&body=Olá ${nome_cliente},`;
+
+        window.open(link, '_blank');
+    }
+
 
     static async saveNewContact() {
         if (!this.newContactName || this.newContactName.trim() === '') {
@@ -117,20 +201,24 @@ class Contatos extends Janela {
                 "nome_cliente": this.newContactName,
                 "numero": this.newContactPhone
             };
-            const result = await fetchJson("/mainpage/setCertNumber.php", [{ "h": "add_contato", "b": payload }]);
+            const result = await fetchJson("/certificadospage/setCertNumber.php", [{ "h": "add_contato", "b": payload }]);
 
             if (result && result.success) {
                 addToast("Sucesso", "Contato adicionado com sucesso!", "success");
 
                 //adiciona na lista com id qualquer
-                this.contacts = [...this.contacts, {
+
+                const newContact = {
                     id: result.id,
                     name: this.newContactName,
                     phone: this.newContactPhone,
                     original: 'localmente adicionado',
                     isOriginalVisible: false,
-                    isPhoneValid: validarTelefone(this.newContactPhone)
-                }];
+                    isPhoneValid: validarContato(this.newContactPhone)
+                }
+                this.insertContactInList(newContact);
+
+
                 this.closeAddContact();
 
                 // Opcional: Se a barra de pesquisa estiver preenchida com parte do nome, refazer busca
@@ -163,21 +251,20 @@ class Contatos extends Janela {
                 "nome_cliente": contact.name,
                 "numero": contact.phone
             };
-            const result = await fetchJson("/mainpage/setCertNumber.php", [{ "h": "edit_contato", "b": payload }]);
+            const result = await fetchJson("/certificadospage/setCertNumber.php", [{ "h": "edit_contato", "b": payload }]);
 
             if (result && result.success) {
                 addToast("Sucesso", "Contato editado com sucesso!", "success");
 
-                //Edita o contato localmente
-                const index = this.contacts.findIndex(c => c.id === contact.id);
-                let originalContact = { ...this.contacts[index] };
-                originalContact.name = contact.name;
-                originalContact.phone = contact.phone;
-                originalContact.isPhoneValid = validarTelefone(contact.phone);
-
-                if (index !== -1) {
-                    this.contacts[index] = {...originalContact};
-                }
+                let updated_contact_list = [...this.contacts];
+                const location = this.findContactLocationById(contact.id);
+                if (location) {
+                    const { groupIndex, contactIndex } = location;
+                    updated_contact_list[groupIndex].contacts[contactIndex].name = contact.name;
+                    updated_contact_list[groupIndex].contacts[contactIndex].phone = contact.phone;
+                    updated_contact_list[groupIndex].contacts[contactIndex].isPhoneValid = validarContato(contact.phone);
+                    this.contacts = updated_contact_list;
+                } 
 
             } else {
                 addToast("Erro", "Erro ao editar contato: " + (result.error || "Desconhecido"), "error");
@@ -198,13 +285,25 @@ class Contatos extends Janela {
             const payload = {
                 "id": contact.id,
             };
-            const result = await fetchJson("/mainpage/setCertNumber.php", [{ "h": "delete_contato", "b": payload }]);
+            const result = await fetchJson("/certificadospage/setCertNumber.php", [{ "h": "delete_contato", "b": payload }]);
 
             if (result && result.success) {
                 addToast("Sucesso", "Contato apagado com sucesso!", "success");
 
                 //remove da lista
-                this.contacts = this.contacts.filter(c => c.id !== contact.id);
+                const location = this.findContactLocationById(contact.id);
+                if (location) {
+                    const { groupIndex, contactIndex } = location;
+                    if (this.contacts[groupIndex].contacts.length === 1) {
+                        // Se for o único contato do grupo, remove o grupo inteiro
+                        this.contacts.splice(groupIndex, 1);
+                    } else {
+                        // Caso contrário, remove apenas o contato específico
+                        this.contacts[groupIndex].contacts.splice(contactIndex, 1);
+                    }
+                }
+
+
             } else {
                 addToast("Erro", "Erro ao apagar contato: " + (result.error || "Desconhecido"), "error");
             }

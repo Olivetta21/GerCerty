@@ -1,7 +1,7 @@
 import { fetchJson } from './fetcher';
-import Main from './Janelas/main/Main';
+import Certificados from './Janelas/certificados/Certificados';
 import { tratarRetornosApi } from "./commonactions";
-import MainModal from './Janelas/main/MainModal';
+import CertCardModal from './Janelas/certificados/CertCardModal';
 import Login from './Janelas/login/Login';
 
 class pgUpdates {
@@ -43,24 +43,24 @@ class pgUpdates {
 
                 // Iteração sobre cada atualização recebida
                 res1.forEach(updtData => {
-                    if (updtData.usuario !== Login.login) {
+                    if (Login.login) {
                         switch (updtData.header) {
                             case "C1": {  //exemplo: { id: 1, header: "C1", body: -1602 }
                                 group_C1.push(Number(updtData.body));
-                                Main.addNotification(updtData.usuario + " modificou " + updtData.body);
+                                Certificados.addNotification(updtData.usuario + " modificou " + updtData.body);
                                 break;
                             }
                             case "C2": {  //exemplo: { id: 1, header: "C2", body: -1602 }
                                 group_C2.push(Number(updtData.body));
-                                Main.addNotification(updtData.usuario + " interagiu com " + updtData.body);
+                                Certificados.addNotification(updtData.usuario + " interagiu com " + updtData.body);
                                 break;
                             }
                             case "CTTA": {  //exemplo: { id: 1, header: "CTTA", body: 'Fulano' }
-                                Main.addNotification(updtData.usuario + " adicionou o contato " + updtData.body);
+                                Certificados.addNotification(updtData.usuario + " adicionou o contato " + updtData.body);
                                 break;
                             }
                             case "CTTE": {  //exemplo: { id: 1, header: "CTTE", body: 'Fulano' }
-                                Main.addNotification(updtData.usuario + " editou o contato " + updtData.body);
+                                Certificados.addNotification(updtData.usuario + " editou o contato " + updtData.body);
                                 break;
                             }
                             default:
@@ -71,13 +71,13 @@ class pgUpdates {
 
 
                 //CERT--------------------------------------------------------------
-                group_C1 = group_C1.filter(cod => Main.findCertIndex(cod) > -1);
-                group_C2 = group_C2.filter(cod => Main.findCertIndex(cod) > -1 && !group_C1.includes(cod));
+                group_C1 = group_C1.filter(cod => Certificados.findCertIndex(cod) > -1);
+                group_C2 = group_C2.filter(cod => Certificados.findCertIndex(cod) > -1 && !group_C1.includes(cod));
                 if (group_C1.length > 0) {
-                    Main.atualizaCerts(group_C1);
+                    Certificados.atualizaCerts(group_C1);
                 }
                 if (group_C2.length > 0) {
-                    MainModal.attCronOnCert(group_C2);
+                    CertCardModal.attCronOnCert(group_C2);
                 }
                 //#CERT--------------------------------------------------------------
             }

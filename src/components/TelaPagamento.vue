@@ -260,7 +260,7 @@
 </template>
 
 <script>
-import Main from '../frontend/scripts/Janelas/main/Main';
+import Certificados from '../frontend/scripts/Janelas/certificados/Certificados';
 import Payment from '../frontend/scripts/Janelas/payment/Payment';
 import { prepareObjArrToCSV, generateCSV, numToStr } from '../frontend/scripts/utils';
 import router from "@/router";
@@ -269,7 +269,7 @@ export default {
 	data() {
 		return {
             router,
-            Main,
+            Certificados,
 
             Payment,
             payouts: Payment.payouts_,
