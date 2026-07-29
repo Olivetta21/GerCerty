@@ -84,7 +84,7 @@
                 <form @submit.prevent="Contatos.saveNewContact()">
                     <div class="form-group">
                         <label>Nome Principal</label>
-                        <input type="text" v-model="newContactName" placeholder="Ex: João da Silva" required />
+                        <input type="text" v-model="newContactName" placeholder="Ex: João da Silva" required :readOnly="addingOnExisting" />
                     </div>
                     <div class="form-group">
                         <label>Contato</label>
@@ -146,6 +146,7 @@ export default {
             newContactName: Contatos.newContactName_,
             newContactPhone: Contatos.newContactPhone_,
             newContactAnnotation: Contatos.newContactAnnotation_,
+            addingOnExisting: Contatos.addingOnExisting_,
             validarTelefone: validarContato,
 
             isEditModalOpen: false,

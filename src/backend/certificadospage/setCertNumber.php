@@ -7,7 +7,7 @@ $pdo = $credentials['pdo'];
 function insertNovoTelefone($credentials, $nome_cliente, $numero, $anotacao = '') {
     try {
         $pdo = $credentials['pdo'];
-        $sql = "INSERT INTO telefones_clientes (cliente, numero, original, prioridade, quem_inseriu, anotacao) VALUES (upper(:cliente), :numero, :original, :prioridade, :quem_inseriu, :anotacao)";
+        $sql = "INSERT INTO telefones_clientes (cliente, numero, original, prioridade, quem_inseriu, anotacao) VALUES (upper(:cliente), :numero, :original, :prioridade, :quem_inseriu, :anotacao) RETURNING id";
         $stmt = $pdo->prepare($sql);
         //returnJson(["erro"=>"nsei"]);
         
@@ -20,7 +20,8 @@ function insertNovoTelefone($credentials, $nome_cliente, $numero, $anotacao = ''
             ':anotacao' => $anotacao,
         ]);
         if ($stmt->rowCount() === 1) {
-            return ["success" => "Número inserido com sucesso"];
+            $id = $stmt->fetch(PDO::FETCH_ASSOC)['id'];
+            return ["success" => "Número inserido com sucesso", "id" => $id];
         } else {
             return ["error" => "Erro ao inserir número na tabela telefones_clientes"];
         }
@@ -169,7 +170,7 @@ if (isset($_POST['set_numero'])){
     $resultado = insertNovoTelefone($credentials, removerAcentos($dados['nome_cliente']), $dados['numero'], $dados['anotacao'] ?? '');
     if (isset($resultado["success"])) {
         addAtualizacao("CTTA", explode(' ', trim($dados['nome_cliente']))[0] ?? '', $credentials);
-        echo correctJson2(["success" => $resultado, "id" => $pdo->lastInsertId()]);
+        echo correctJson2(["success" => $resultado['success'], "id" => $resultado['id']]);
         exit;
     } else {
         echo correctJson2(["error" => $resultado]);

@@ -16,6 +16,7 @@ class Contatos extends Janela {
     static _newContactName = ref('');
     static _newContactPhone = ref('');
     static _newContactAnnotation = ref('');
+    static _addingOnExisting = ref(false);
 
     static get searchQuery_() { return this._searchQuery; }
     static get searchQuery() { return this._searchQuery.value; }
@@ -44,6 +45,10 @@ class Contatos extends Janela {
     static get newContactAnnotation_() { return this._newContactAnnotation; }
     static get newContactAnnotation() { return this._newContactAnnotation.value; }
     static set newContactAnnotation(val) { this._newContactAnnotation.value = val; }
+
+    static get addingOnExisting_() { return this._addingOnExisting; }
+    static get addingOnExisting() { return this._addingOnExisting.value; }
+    static set addingOnExisting(val) { this._addingOnExisting.value = val; }
 
 
     static insertContactInList(contact) {
@@ -145,6 +150,7 @@ class Contatos extends Janela {
     static openAddContact(contact) {
         if (contact) {
             this.newContactName = contact.name;
+            this.addingOnExisting = true;
         }
         this.isAddModalOpen = true;
     }
@@ -154,6 +160,7 @@ class Contatos extends Janela {
         this.newContactName = '';
         this.newContactPhone = '';
         this.newContactAnnotation = '';
+        this.addingOnExisting = false;
     }
 
     static async sendWhatsapp(contato) {
@@ -275,7 +282,7 @@ class Contatos extends Janela {
                 let updated_contact_list = [...this.contacts];
                 const location = this.findContactLocationById(contact.id);
                 if (location) {
-                    const { groupIndex, contactIndex } = location;
+                    let { groupIndex, contactIndex } = location;
 
 
                     updated_contact_list[groupIndex].contacts[contactIndex].name = contact.name;
@@ -286,6 +293,20 @@ class Contatos extends Janela {
                     if (updated_contact_list[groupIndex].contacts.length === 1) {
                         // Se for o único contato do grupo, atualiza o nome do grupo também
                         updated_contact_list[groupIndex].name = contact.name;
+                    }
+                    //se o nome estiver diferente do nome do grupo, precisa mover o contato para outro grupo
+                    else if (updated_contact_list[groupIndex].name !== contact.name) {
+                        updated_contact_list.push({
+                            name: contact.name,
+                            contacts: [updated_contact_list[groupIndex].contacts[contactIndex]]
+                        });
+                        updated_contact_list[groupIndex].contacts.splice(contactIndex, 1);
+                        if (updated_contact_list[groupIndex].contacts.length === 0) {
+                            // Se o grupo ficar vazio, remove-o
+                            updated_contact_list.splice(groupIndex, 1);
+                        }
+                        groupIndex = updated_contact_list.length - 1;
+                        contactIndex = 0;
                     }
 
                     //verifica se precisa agrupar novamente (o novo nome pode ja existir em outro grupo)
@@ -306,11 +327,11 @@ class Contatos extends Janela {
                 } 
 
             } else {
-                addToast("Erro", "Erro ao editar contato: " + (result.error || "Desconhecido"), "error");
+                addToast("Erro", "Erro ao editar contato: " + (result.error || "Desconhecido"), "error", true);
             }
         } catch (error) {
             console.error("Erro ao editar contato:", error);
-            addToast("Erro", "Ocorreu um erro ao tentar editar o contato.", "error");
+            addToast("Erro", "Ocorreu um erro ao tentar editar o contato.", "error", true);
         }
 
     }
