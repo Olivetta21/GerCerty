@@ -373,6 +373,21 @@ class Contatos extends Janela {
         }
 
     }
+
+    static asc = true;
+    static sortContacts() {
+        let sortedContacts = [...this.contacts];
+        sortedContacts.sort((a, b) => {
+            if (this.asc) {
+                return a.name.localeCompare(b.name);
+            } else {
+                return b.name.localeCompare(a.name);
+            }
+        });
+
+        this.contacts = sortedContacts;
+        this.asc = !this.asc;
+    }
 }
 
 export default Contatos;

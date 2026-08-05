@@ -205,7 +205,7 @@ class Certificados extends Janela {
 
 
     //Ordenar os certificados;
-    static certAcendingOrder = { 'id': true, 'usos': true, 'nome': true, 'venc': true, 'notf': true, 'agnd': true, 'prbl': true };
+    static certAcendingOrder = { 'id': true, 'usos': true, 'nome': true, 'venc': true, 'notf': true, 'agnd': true, 'prbl': true, 'local': true, 'info': true, 'avisar': true };
     static sortCertBy(col) {
         this.loadingCert = true;
         let asc = (this.certAcendingOrder.col = !this.certAcendingOrder.col);
@@ -244,6 +244,21 @@ class Certificados extends Janela {
             case 'prbl': {
                 if (asc) this.certs.sort((a, b) => a.prbl - b.prbl);
                 else this.certs.sort((b, a) => a.prbl - b.prbl);
+                break
+            }
+            case 'local': {
+                if (asc) this.certs.sort((a, b) => (a.local+a.emusopor).localeCompare(b.local+b.emusopor));
+                else this.certs.sort((b, a) => (a.local+a.emusopor).localeCompare(b.local+b.emusopor));
+                break
+            }
+            case 'info': {
+                if (asc) this.certs.sort((a, b) => String(a.agnd+a.prbl).localeCompare(b.agnd+b.prbl));
+                else this.certs.sort((b, a) => String(a.agnd+a.prbl).localeCompare(b.agnd+b.prbl));
+                break
+            }
+            case 'avisar': {
+                if (asc) this.certs.sort((a, b) => String(a.agnd+a.notf+a.venc).localeCompare(b.agnd+b.notf+b.venc));
+                else this.certs.sort((b, a) => String(a.agnd+a.notf+a.venc).localeCompare(b.agnd+b.notf+b.venc));
                 break
             }
         }

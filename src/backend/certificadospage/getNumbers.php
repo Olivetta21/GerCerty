@@ -25,7 +25,7 @@ function buscarTelefonesPorNome($pdo, $nomePessoa) {
     });
 
     // Obrigatoriamente contém o primeiro nome
-    $sql = "SELECT * FROM telefones_clientes WHERE concat(upper(cliente), ' ', upper(anotacao)) LIKE :primeiro_nome";
+    $sql = "SELECT * FROM telefones_clientes WHERE concat(upper(cliente), ' ', upper(anotacao), ' ', upper(numero)) LIKE :primeiro_nome";
     $params = [':primeiro_nome' => '%' . $primeiroNome . '%'];
 
     // Se houver outros nomes, deve conter ao menos um deles
@@ -33,7 +33,7 @@ function buscarTelefonesPorNome($pdo, $nomePessoa) {
         $condicoesOr = [];
         foreach ($outrosNomes as $index => $nome) {
             $paramName = ':outro_nome_' . $index;
-            $condicoesOr[] = "concat(upper(cliente), ' ', upper(anotacao)) LIKE " . $paramName;
+            $condicoesOr[] = "concat(upper(cliente), ' ', upper(anotacao), ' ', upper(numero)) LIKE " . $paramName;
             $params[$paramName] = '%' . $nome . '%';
         }
         $sql .= " AND (" . implode(' OR ', $condicoesOr) . ")";

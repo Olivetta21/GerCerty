@@ -18,7 +18,7 @@
                 <p style="margin-top:10px; color:#666;">Buscando...</p>
             </div>
             <table v-else class="contacts-table outside">
-                <thead>
+                <thead @click="Contatos.sortContacts()">
                     <tr>
                         <th>Contato</th>
                     </tr>

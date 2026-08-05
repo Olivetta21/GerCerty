@@ -49,9 +49,9 @@
                             <th @click="Certificados.sortCertBy('usos')">Usos</th>
                             <th @click="Certificados.sortCertBy('nome')" class="col-fit-content">Nome</th>
                             <th @click="Certificados.sortCertBy('venc')">Vencimento</th>
-                            <th @click="Certificados.sortCertBy('agnd')" id="thAgend">Local</th>
-                            <th @click="Certificados.sortCertBy('notf')" id="thNotfi">info</th>
-                            <th @click="Certificados.sortCertBy('prbl')" id="thAlert">avisar</th>
+                            <th @click="Certificados.sortCertBy('local')" id="thAgend">Local</th>
+                            <th @click="Certificados.sortCertBy('info')" id="thNotfi">info</th>
+                            <th @click="Certificados.sortCertBy('avisar')" id="thAlert">avisar</th>
                         </tr>
                     </thead>
                     <tbody>
